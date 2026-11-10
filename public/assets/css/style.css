@@ -1,9 +1,8 @@
 :root {
-    color-scheme: light;
     font-family: system-ui, sans-serif;
     line-height: 1.5;
-    color: #192333;
-    background: #f5f7fa;
+    color: #24272d;
+    background: #faf9f6;
 }
 
 * {
@@ -12,13 +11,23 @@
 
 body {
     display: flex;
-    min-height: 100vh;
     flex-direction: column;
+    min-height: 100vh;
     margin: 0;
 }
 
+h1,
+h2,
+p {
+    margin: 0;
+}
+
+a {
+    color: inherit;
+}
+
 .container {
-    width: min(100% - 2rem, 64rem);
+    width: min(100% - 2rem, 72rem);
     margin-inline: auto;
 }
 
@@ -28,27 +37,127 @@ body {
 }
 
 .site-header {
-    border-bottom: 1px solid #dce2e8;
+    border-bottom: 1px solid #e9e6e1;
 }
 
-.site-header h1 {
-    margin: 0;
-    padding-block: 1rem;
-    font-size: 1.25rem;
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 4.5rem;
+}
+
+.brand {
+    font-size: 1.4rem;
+    font-weight: 750;
+    letter-spacing: -0.05em;
+    text-decoration: none;
+}
+
+.brand span {
+    color: #e35a45;
+}
+
+nav a {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+nav a:hover {
+    color: #c54d39;
 }
 
 main {
     flex: 1;
-    padding-block: clamp(2rem, 8vw, 5rem);
 }
 
-main h2 {
-    margin-top: 0;
-    font-size: clamp(1.75rem, 5vw, 2.5rem);
+.intro {
+    padding-block: 4rem 3.5rem;
+}
+
+.eyebrow {
+    color: #b34230;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.intro h1 {
+    max-width: 16ch;
+    margin-top: 0.8rem;
+    font-size: clamp(2.4rem, 7vw, 4.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.05em;
+}
+
+.intro-copy {
+    max-width: 38rem;
+    margin-top: 1rem;
+    color: #62676f;
+}
+
+.gallery {
+    padding-bottom: 5rem;
+}
+
+.section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding-block: 1.5rem;
+    border-top: 1px solid #e9e6e1;
+}
+
+.section-heading h2 {
+    font-size: 1.7rem;
+    letter-spacing: -0.03em;
+}
+
+.section-heading p {
+    color: #62676f;
+    font-size: 0.9rem;
+}
+
+.photo-grid {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.photo-card {
+    overflow: hidden;
+    border: 1px solid #e9e6e1;
+    border-radius: 0.9rem;
+    background: #fff;
+}
+
+.photo-placeholder {
+    display: grid;
+    aspect-ratio: 4 / 3;
+    place-items: center;
+    background: #efede9;
+    color: #777;
+    font-size: 0.9rem;
 }
 
 .site-footer {
-    border-top: 1px solid #dce2e8;
-    padding-block: 1rem;
-    color: #526071;
+    border-top: 1px solid #e9e6e1;
+    padding-block: 1.5rem;
+    color: #62676f;
+    font-size: 0.85rem;
+}
+
+@media (min-width: 640px) {
+    .photo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .photo-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }

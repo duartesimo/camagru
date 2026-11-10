@@ -1,0 +1,10 @@
+/.env
+/.env.*
+!/.env.example
+/secrets/
+*.pem
+*.key
+*.log
+/.idea/
+/.vscode/
+.DS_Store

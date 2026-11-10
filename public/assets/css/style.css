@@ -1,0 +1,54 @@
+:root {
+    color-scheme: light;
+    font-family: system-ui, sans-serif;
+    line-height: 1.5;
+    color: #192333;
+    background: #f5f7fa;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    margin: 0;
+}
+
+.container {
+    width: min(100% - 2rem, 64rem);
+    margin-inline: auto;
+}
+
+.site-header,
+.site-footer {
+    background: #fff;
+}
+
+.site-header {
+    border-bottom: 1px solid #dce2e8;
+}
+
+.site-header h1 {
+    margin: 0;
+    padding-block: 1rem;
+    font-size: 1.25rem;
+}
+
+main {
+    flex: 1;
+    padding-block: clamp(2rem, 8vw, 5rem);
+}
+
+main h2 {
+    margin-top: 0;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+}
+
+.site-footer {
+    border-top: 1px solid #dce2e8;
+    padding-block: 1rem;
+    color: #526071;
+}

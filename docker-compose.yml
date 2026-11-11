@@ -7,6 +7,12 @@ services:
       - "127.0.0.1:8080:80"
     volumes:
       - ./public:/var/www/html/public:ro
+      - ./src:/var/www/html/src:ro
+    environment:
+      DB_HOST: db
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
 
   db:
     image: postgres:17

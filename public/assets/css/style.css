@@ -467,3 +467,42 @@ main {
         align-items: flex-start;
     }
 }
+/* Authenticated navigation */
+.site-header .site-nav {
+    flex-wrap: wrap;
+}
+
+.site-nav .nav-username {
+    font-size: 0.9rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.site-nav .logout-form {
+    margin: 0;
+}
+
+.site-nav .logout-button {
+    padding: 0.45rem 0.8rem;
+    border: 1px solid #d8d5d0;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #24272d;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+.site-nav .logout-button:hover {
+    background: #f4f2ee;
+}
+
+.site-nav .logout-button:focus-visible {
+    outline: 3px solid #e35a45;
+    outline-offset: 2px;
+}
+
+.nav-username strong {
+    text-transform: uppercase;
+}

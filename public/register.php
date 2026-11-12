@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 session_start();
 
+if (isset($_SESSION['user_id'])) {
+    header('Location: /');
+    exit;
+}
+
 require_once __DIR__ . '/../src/database.php';
 
 if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
@@ -40,12 +45,14 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $errors['email'] = 'Enter a valid email address.';
         }
 
-        if (strlen($password) < 12 || strlen($password) > 72
+        if (
+            strlen($password) < 12 || strlen($password) > 72
             || str_contains($password, "\0")
             || preg_match('/[a-z]/', $password) !== 1
             || preg_match('/[A-Z]/', $password) !== 1
             || preg_match('/[0-9]/', $password) !== 1
-            || preg_match('/[^A-Za-z0-9]/', $password) !== 1) {
+            || preg_match('/[^A-Za-z0-9]/', $password) !== 1
+        ) {
             $errors['password'] = 'Use 12 to 72 bytes with uppercase and lowercase letters, a number, and a symbol.';
         }
 
@@ -87,6 +94,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 ?>
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -94,18 +102,20 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     <title>Register | Camagru</title>
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
+
 <body>
     <header class="site-header">
         <div class="container header-inner">
             <a class="brand" href="/" aria-label="Camagru home">
                 <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/>
-                    <circle cx="12" cy="14" r="4"/>
+                    <path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" />
+                    <circle cx="12" cy="14" r="4" />
                 </svg>
                 <strong>Camagru</strong>
             </a>
             <nav class="site-nav" aria-label="Main navigation">
                 <a href="/">Gallery</a>
+                <a href="/login.php">Login</a>
                 <a class="nav-active" href="/register.php" aria-current="page">Register</a>
             </nav>
         </div>
@@ -144,7 +154,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
                     <div class="form-field">
                         <label for="username">Username</label>
-                        <input id="username" name="username" type="text" autocomplete="username" required minlength="3" maxlength="30" placeholder="Choose a username" value="<?= htmlspecialchars($username, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"<?= isset($errors['username']) ? ' aria-invalid="true" aria-describedby="username-error"' : '' ?>>
+                        <input id="username" name="username" type="text" autocomplete="username" required minlength="3" maxlength="30" placeholder="Choose a username" value="<?= htmlspecialchars($username, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>" <?= isset($errors['username']) ? ' aria-invalid="true" aria-describedby="username-error"' : '' ?>>
                         <?php if (isset($errors['username'])): ?>
                             <p class="field-error" id="username-error"><?= htmlspecialchars($errors['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
                         <?php endif; ?>
@@ -152,7 +162,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
                     <div class="form-field">
                         <label for="email">Email address</label>
-                        <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="Enter your email address" value="<?= htmlspecialchars($email, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"<?= isset($errors['email']) ? ' aria-invalid="true" aria-describedby="email-error"' : '' ?>>
+                        <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="Enter your email address" value="<?= htmlspecialchars($email, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>" <?= isset($errors['email']) ? ' aria-invalid="true" aria-describedby="email-error"' : '' ?>>
                         <?php if (isset($errors['email'])): ?>
                             <p class="field-error" id="email-error"><?= htmlspecialchars($errors['email'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
                         <?php endif; ?>
@@ -160,7 +170,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
                     <div class="form-field">
                         <label for="password">Password</label>
-                        <input id="password" name="password" type="password" autocomplete="new-password" required minlength="12" placeholder="Create a strong password" aria-describedby="password-hint<?= isset($errors['password']) ? ' password-error' : '' ?>"<?= isset($errors['password']) ? ' aria-invalid="true"' : '' ?>>
+                        <input id="password" name="password" type="password" autocomplete="new-password" required minlength="12" placeholder="Create a strong password" aria-describedby="password-hint<?= isset($errors['password']) ? ' password-error' : '' ?>" <?= isset($errors['password']) ? ' aria-invalid="true"' : '' ?>>
                         <p class="field-hint" id="password-hint">12–72 bytes, with uppercase and lowercase letters, a number and a symbol.</p>
                         <?php if (isset($errors['password'])): ?>
                             <p class="field-error" id="password-error"><?= htmlspecialchars($errors['password'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
@@ -169,7 +179,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
                     <div class="form-field">
                         <label for="password_confirmation">Confirm password</label>
-                        <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required placeholder="Confirm your password"<?= isset($errors['password_confirmation']) ? ' aria-invalid="true" aria-describedby="confirmation-error"' : '' ?>>
+                        <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required placeholder="Confirm your password" <?= isset($errors['password_confirmation']) ? ' aria-invalid="true" aria-describedby="confirmation-error"' : '' ?>>
                         <?php if (isset($errors['password_confirmation'])): ?>
                             <p class="field-error" id="confirmation-error"><?= htmlspecialchars($errors['password_confirmation'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
                         <?php endif; ?>
@@ -189,4 +199,5 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         </div>
     </footer>
 </body>
+
 </html>

@@ -591,3 +591,108 @@ main {
     margin-top: 0.9rem;
     font-size: 0.9rem;
 }
+/* Overlay preview and selection */
+.camera-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: #20252b;
+}
+
+.camera-frame > #camera-preview {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    aspect-ratio: auto;
+    border-radius: 0;
+    object-fit: cover;
+}
+
+.camera-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
+}
+
+.camera-overlay[hidden] {
+    display: none;
+}
+
+.overlay-picker {
+    min-inline-size: 0;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #e8e5df;
+    border-radius: 0.75rem;
+    background: #fff;
+}
+
+.overlay-picker legend {
+    padding-inline: 0.3rem;
+    font-weight: 700;
+}
+
+.overlay-picker > p {
+    margin-bottom: 1rem;
+    color: #62676f;
+    font-size: 0.9rem;
+}
+
+.overlay-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+    gap: 0.75rem;
+}
+
+.overlay-radio {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+
+.overlay-choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.55rem;
+    border: 2px solid #e8e5df;
+    border-radius: 0.6rem;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 650;
+    text-align: center;
+}
+
+.overlay-choice img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    border-radius: 0.35rem;
+    background: #f4f2ee;
+    object-fit: contain;
+}
+
+.overlay-radio:checked + .overlay-choice {
+    border-color: #b83e2b;
+    background: #fff4f1;
+}
+
+.overlay-radio:focus-visible + .overlay-choice {
+    outline: 3px solid #e35a45;
+    outline-offset: 2px;
+}
+
+.clear-overlay-button {
+    margin-top: 1rem;
+}

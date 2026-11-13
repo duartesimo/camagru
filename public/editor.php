@@ -64,7 +64,10 @@ if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
 
         <section class="editor-panel" aria-labelledby="camera-title">
             <h2 id="camera-title">Live camera</h2>
-            <video id="camera-preview" autoplay muted playsinline aria-label="Live webcam preview"></video>
+            <div class="camera-frame">
+                <video id="camera-preview" autoplay muted playsinline aria-label="Live webcam preview"></video>
+                <img class="camera-overlay" id="camera-overlay" alt="" hidden>
+            </div>
             <div class="camera-controls">
                 <button class="submit-button" id="start-camera" type="button">Start camera</button>
                 <button class="camera-stop-button" id="stop-camera" type="button" disabled>Stop camera</button>
@@ -74,6 +77,30 @@ if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
                 <p class="camera-status">Enable JavaScript to use the camera preview.</p>
             </noscript>
         </section>
+        <fieldset class="overlay-picker">
+            <legend>Choose an overlay</legend>
+            <p>Select one PNG to preview over the camera. Selection also works while the camera is off.</p>
+            <div class="overlay-options">
+                <input class="overlay-radio" type="radio" name="overlay" id="overlay-hat" value="/assets/images/overlays/hat.png">
+                <label class="overlay-choice" for="overlay-hat">
+                    <img src="/assets/images/overlays/hat.png" alt="" width="96" height="72">
+                    <span>Hat</span>
+                </label>
+
+                <input class="overlay-radio" type="radio" name="overlay" id="overlay-sunglasses" value="/assets/images/overlays/sunglasses.png">
+                <label class="overlay-choice" for="overlay-sunglasses">
+                    <img src="/assets/images/overlays/sunglasses.png" alt="" width="96" height="72">
+                    <span>Sunglasses</span>
+                </label>
+
+                <input class="overlay-radio" type="radio" name="overlay" id="overlay-frame" value="/assets/images/overlays/frame.png">
+                <label class="overlay-choice" for="overlay-frame">
+                    <img src="/assets/images/overlays/frame.png" alt="" width="96" height="72">
+                    <span>Frame</span>
+                </label>
+            </div>
+            <button class="camera-stop-button clear-overlay-button" id="clear-overlay" type="button" disabled>Clear overlay</button>
+        </fieldset>
     </main>
 
     <footer class="site-footer">

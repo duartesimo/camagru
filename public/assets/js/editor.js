@@ -46,3 +46,26 @@ async function startCamera() {
 startButton.addEventListener('click', startCamera);
 stopButton.addEventListener('click', stopCamera);
 window.addEventListener('pagehide', stopCamera);
+
+const selectedOverlayImage = document.querySelector('#camera-overlay');
+const overlayInputs = document.querySelectorAll('.overlay-radio');
+const clearOverlayButton = document.querySelector('#clear-overlay');
+
+overlayInputs.forEach((input) => {
+    input.addEventListener('change', () => {
+        if (input.checked) {
+            selectedOverlayImage.src = input.value;
+            selectedOverlayImage.hidden = false;
+            clearOverlayButton.disabled = false;
+        }
+    });
+});
+
+clearOverlayButton.addEventListener('click', () => {
+    overlayInputs.forEach((input) => {
+        input.checked = false;
+    });
+    selectedOverlayImage.hidden = true;
+    selectedOverlayImage.removeAttribute('src');
+    clearOverlayButton.disabled = true;
+});

@@ -602,6 +602,8 @@ main {
 }
 
 .camera-frame > #camera-preview {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
@@ -695,4 +697,34 @@ main {
 
 .clear-overlay-button {
     margin-top: 1rem;
+}
+
+#take-photo:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.capture-message {
+    margin-top: 0.9rem;
+    color: #a02e23;
+    font-size: 0.9rem;
+}
+
+.capture-result {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e8e5df;
+}
+
+.capture-result h3 {
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.capture-result img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 0.75rem;
+    object-fit: contain;
 }

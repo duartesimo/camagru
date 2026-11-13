@@ -25,9 +25,10 @@ if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Preview your camera in the Camagru photo editor.">
+    <meta name="description" content="Capture a webcam photo with a Camagru overlay.">
     <title>Editor | Camagru</title>
     <link rel="stylesheet" href="/assets/css/style.css">
+    <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
     <script src="/assets/js/editor.js" defer></script>
 </head>
 
@@ -59,7 +60,7 @@ if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
         <div class="editor-heading">
             <span class="register-pill">Photo editor</span>
             <h1>Camera preview</h1>
-            <p>Turn on your camera to see a live preview. Photo capture will be added later.</p>
+            <p>Turn on your camera, choose an overlay, and take a photo.</p>
         </div>
 
         <section class="editor-panel" aria-labelledby="camera-title">
@@ -71,8 +72,14 @@ if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
             <div class="camera-controls">
                 <button class="submit-button" id="start-camera" type="button">Start camera</button>
                 <button class="camera-stop-button" id="stop-camera" type="button" disabled>Stop camera</button>
+                <button class="submit-button" id="take-photo" type="button" disabled>Take photo</button>
             </div>
             <p class="camera-status" id="camera-status" role="status" aria-live="polite">Camera is off.</p>
+            <p class="capture-message" id="capture-message" role="alert" hidden></p>
+            <section class="capture-result" id="capture-result" aria-labelledby="capture-result-title" hidden>
+                <h3 id="capture-result-title">Last captured photo</h3>
+                <img id="final-photo" alt="Captured photo with the selected overlay">
+            </section>
             <noscript>
                 <p class="camera-status">Enable JavaScript to use the camera preview.</p>
             </noscript>
@@ -81,19 +88,19 @@ if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
             <legend>Choose an overlay</legend>
             <p>Select one PNG to preview over the camera. Selection also works while the camera is off.</p>
             <div class="overlay-options">
-                <input class="overlay-radio" type="radio" name="overlay" id="overlay-hat" value="/assets/images/overlays/hat.png">
+                <input class="overlay-radio" type="radio" name="overlay" id="overlay-hat" value="hat" data-src="/assets/images/overlays/hat.png">
                 <label class="overlay-choice" for="overlay-hat">
                     <img src="/assets/images/overlays/hat.png" alt="" width="96" height="72">
                     <span>Hat</span>
                 </label>
 
-                <input class="overlay-radio" type="radio" name="overlay" id="overlay-sunglasses" value="/assets/images/overlays/sunglasses.png">
+                <input class="overlay-radio" type="radio" name="overlay" id="overlay-sunglasses" value="sunglasses" data-src="/assets/images/overlays/sunglasses.png">
                 <label class="overlay-choice" for="overlay-sunglasses">
                     <img src="/assets/images/overlays/sunglasses.png" alt="" width="96" height="72">
                     <span>Sunglasses</span>
                 </label>
 
-                <input class="overlay-radio" type="radio" name="overlay" id="overlay-frame" value="/assets/images/overlays/frame.png">
+                <input class="overlay-radio" type="radio" name="overlay" id="overlay-frame" value="frame" data-src="/assets/images/overlays/frame.png">
                 <label class="overlay-choice" for="overlay-frame">
                     <img src="/assets/images/overlays/frame.png" alt="" width="96" height="72">
                     <span>Frame</span>

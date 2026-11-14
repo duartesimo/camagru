@@ -728,3 +728,10 @@ main {
     border-radius: 0.75rem;
     object-fit: contain;
 }
+
+.capture-success {
+    margin-top: 0.75rem;
+    color: #245b38;
+    font-size: 0.9rem;
+    font-weight: 650;
+}

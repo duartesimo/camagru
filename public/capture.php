@@ -31,6 +31,8 @@ if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])
     reject_capture(403, 'Please reload the editor and try again.');
 }
 
+$userId = $_SESSION['user_id'];
+
 $overlays = [
     'hat' => __DIR__ . '/assets/images/overlays/hat.png',
     'sunglasses' => __DIR__ . '/assets/images/overlays/sunglasses.png',
@@ -93,6 +95,42 @@ $result = ob_get_clean();
 
 if (!$encoded || !is_string($result) || $result === '') {
     reject_capture(500, 'The photo could not be processed.');
+}
+
+require_once __DIR__ . '/../src/database.php';
+
+try {
+    $database = database_connection();
+} catch (PDOException | RuntimeException) {
+    reject_capture(500, 'The photo could not be saved.');
+}
+
+try {
+    $filename = bin2hex(random_bytes(16)) . '.png';
+} catch (Throwable) {
+    reject_capture(500, 'The photo could not be saved.');
+}
+
+$filePath = '/var/lib/camagru/photos/' . $filename;
+
+$written = @file_put_contents($filePath, $result, LOCK_EX);
+
+if ($written !== strlen($result)) {
+    @unlink($filePath);
+    reject_capture(500, 'The photo could not be saved.');
+}
+
+try {
+    $statement = $database->prepare(
+        'INSERT INTO photos (user_id, filename) VALUES (:user_id, :filename)'
+    );
+    $statement->execute([
+        'user_id' => $userId,
+        'filename' => $filename,
+    ]);
+} catch (PDOException | RuntimeException) {
+    @unlink($filePath);
+    reject_capture(500, 'The photo could not be saved.');
 }
 
 header('Content-Type: image/png');

@@ -79,6 +79,7 @@ if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
             <section class="capture-result" id="capture-result" aria-labelledby="capture-result-title" hidden>
                 <h3 id="capture-result-title">Last captured photo</h3>
                 <img id="final-photo" alt="Captured photo with the selected overlay">
+                <p class="capture-success" id="capture-success" role="status" hidden>Photo saved to your account.</p>
             </section>
             <noscript>
                 <p class="camera-status">Enable JavaScript to use the camera preview.</p>

@@ -8,6 +8,7 @@ const takePhotoButton = document.querySelector('#take-photo');
 const captureMessage = document.querySelector('#capture-message');
 const captureResult = document.querySelector('#capture-result');
 const finalPhoto = document.querySelector('#final-photo');
+const captureSuccess = document.querySelector('#capture-success');
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
 let cameraStream = null;
@@ -95,6 +96,7 @@ async function takePhoto() {
     captureBusy = true;
     updateTakePhotoButton();
     captureMessage.hidden = true;
+    captureSuccess.hidden = true;
 
     try {
         const sourceWidth = video.videoWidth;
@@ -164,6 +166,7 @@ async function takePhoto() {
         finalPhoto.src = photoUrl;
         finalPhoto.alt = `Captured photo with ${selectedOverlay.value} overlay`;
         captureResult.hidden = false;
+        captureSuccess.hidden = false;
     } catch {
         captureMessage.textContent = 'Could not capture or process the photo. Please try again.';
         captureMessage.hidden = false;

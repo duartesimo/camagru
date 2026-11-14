@@ -18,6 +18,24 @@ header('Cache-Control: no-store');
 if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+
+$deleteStatus = $_SESSION['photo_delete_status'] ?? null;
+unset($_SESSION['photo_delete_status']);
+
+require_once __DIR__ . '/../src/database.php';
+
+$personalPhotos = [];
+$historyError = false;
+try {
+    $statement = database_connection()->prepare(
+        'SELECT id FROM photos WHERE user_id = :user_id ORDER BY created_at DESC, id DESC'
+    );
+    $statement->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+    $statement->execute();
+    $personalPhotos = $statement->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException | RuntimeException) {
+    $historyError = true;
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -63,52 +81,84 @@ if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
             <p>Turn on your camera, choose an overlay, and take a photo.</p>
         </div>
 
-        <section class="editor-panel" aria-labelledby="camera-title">
-            <h2 id="camera-title">Live camera</h2>
-            <div class="camera-frame">
-                <video id="camera-preview" autoplay muted playsinline aria-label="Live webcam preview"></video>
-                <img class="camera-overlay" id="camera-overlay" alt="" hidden>
-            </div>
-            <div class="camera-controls">
-                <button class="submit-button" id="start-camera" type="button">Start camera</button>
-                <button class="camera-stop-button" id="stop-camera" type="button" disabled>Stop camera</button>
-                <button class="submit-button" id="take-photo" type="button" disabled>Take photo</button>
-            </div>
-            <p class="camera-status" id="camera-status" role="status" aria-live="polite">Camera is off.</p>
-            <p class="capture-message" id="capture-message" role="alert" hidden></p>
-            <section class="capture-result" id="capture-result" aria-labelledby="capture-result-title" hidden>
-                <h3 id="capture-result-title">Last captured photo</h3>
-                <img id="final-photo" alt="Captured photo with the selected overlay">
-                <p class="capture-success" id="capture-success" role="status" hidden>Photo saved to your account.</p>
-            </section>
-            <noscript>
-                <p class="camera-status">Enable JavaScript to use the camera preview.</p>
-            </noscript>
-        </section>
-        <fieldset class="overlay-picker">
-            <legend>Choose an overlay</legend>
-            <p>Select one PNG to preview over the camera. Selection also works while the camera is off.</p>
-            <div class="overlay-options">
-                <input class="overlay-radio" type="radio" name="overlay" id="overlay-hat" value="hat" data-src="/assets/images/overlays/hat.png">
-                <label class="overlay-choice" for="overlay-hat">
-                    <img src="/assets/images/overlays/hat.png" alt="" width="96" height="72">
-                    <span>Hat</span>
-                </label>
+        <?php if ($deleteStatus === 'success'): ?>
+            <p class="editor-notice editor-notice-success" role="status">Photo deleted.</p>
+        <?php elseif ($deleteStatus === 'error'): ?>
+            <p class="editor-notice editor-notice-error" role="alert">Could not delete the photo. Please try again.</p>
+        <?php endif; ?>
 
-                <input class="overlay-radio" type="radio" name="overlay" id="overlay-sunglasses" value="sunglasses" data-src="/assets/images/overlays/sunglasses.png">
-                <label class="overlay-choice" for="overlay-sunglasses">
-                    <img src="/assets/images/overlays/sunglasses.png" alt="" width="96" height="72">
-                    <span>Sunglasses</span>
-                </label>
+        <div class="editor-workspace">
+            <div class="editor-main">
+                <section class="editor-panel" aria-labelledby="camera-title">
+                    <h2 id="camera-title">Live camera</h2>
+                    <div class="camera-frame">
+                        <video id="camera-preview" autoplay muted playsinline aria-label="Live webcam preview"></video>
+                        <img class="camera-overlay" id="camera-overlay" alt="" hidden>
+                    </div>
+                    <div class="camera-controls">
+                        <button class="submit-button" id="start-camera" type="button">Start camera</button>
+                        <button class="camera-stop-button" id="stop-camera" type="button" disabled>Stop camera</button>
+                        <button class="submit-button" id="take-photo" type="button" disabled>Take photo</button>
+                    </div>
+                    <p class="camera-status" id="camera-status" role="status" aria-live="polite">Camera is off.</p>
+                    <p class="capture-message" id="capture-message" role="alert" hidden></p>
+                    <section class="capture-result" id="capture-result" aria-labelledby="capture-result-title" hidden>
+                        <h3 id="capture-result-title">Last captured photo</h3>
+                        <img id="final-photo" alt="Captured photo with the selected overlay">
+                        <p class="capture-success" id="capture-success" role="status" hidden>Photo saved to your account.</p>
+                    </section>
+                    <noscript>
+                        <p class="camera-status">Enable JavaScript to use the camera preview.</p>
+                    </noscript>
+                </section>
+                <fieldset class="overlay-picker">
+                    <legend>Choose an overlay</legend>
+                    <p>Select one PNG to preview over the camera. Selection also works while the camera is off.</p>
+                    <div class="overlay-options">
+                        <input class="overlay-radio" type="radio" name="overlay" id="overlay-hat" value="hat" data-src="/assets/images/overlays/hat.png">
+                        <label class="overlay-choice" for="overlay-hat">
+                            <img src="/assets/images/overlays/hat.png" alt="" width="96" height="72">
+                            <span>Hat</span>
+                        </label>
 
-                <input class="overlay-radio" type="radio" name="overlay" id="overlay-frame" value="frame" data-src="/assets/images/overlays/frame.png">
-                <label class="overlay-choice" for="overlay-frame">
-                    <img src="/assets/images/overlays/frame.png" alt="" width="96" height="72">
-                    <span>Frame</span>
-                </label>
+                        <input class="overlay-radio" type="radio" name="overlay" id="overlay-sunglasses" value="sunglasses" data-src="/assets/images/overlays/sunglasses.png">
+                        <label class="overlay-choice" for="overlay-sunglasses">
+                            <img src="/assets/images/overlays/sunglasses.png" alt="" width="96" height="72">
+                            <span>Sunglasses</span>
+                        </label>
+
+                        <input class="overlay-radio" type="radio" name="overlay" id="overlay-frame" value="frame" data-src="/assets/images/overlays/frame.png">
+                        <label class="overlay-choice" for="overlay-frame">
+                            <img src="/assets/images/overlays/frame.png" alt="" width="96" height="72">
+                            <span>Frame</span>
+                        </label>
+                    </div>
+                    <button class="camera-stop-button clear-overlay-button" id="clear-overlay" type="button" disabled>Clear overlay</button>
+                </fieldset>
             </div>
-            <button class="camera-stop-button clear-overlay-button" id="clear-overlay" type="button" disabled>Clear overlay</button>
-        </fieldset>
+
+            <aside class="editor-sidebar" aria-labelledby="personal-photos-title">
+                <h2 id="personal-photos-title">My photos</h2>
+                <?php if ($historyError): ?>
+                    <p>Your photos are unavailable right now.</p>
+                <?php elseif ($personalPhotos === []): ?>
+                    <p>You have not saved any photos yet.</p>
+                <?php else: ?>
+                    <ul class="personal-photo-list">
+                        <?php foreach ($personalPhotos as $photo): ?>
+                            <li class="personal-photo">
+                                <img src="/photo.php?id=<?= (int) $photo['id'] ?>" alt="Your saved photo <?= (int) $photo['id'] ?>" width="640" height="480" loading="lazy">
+                                <form action="/delete_photo.php" method="post">
+                                    <input type="hidden" name="photo_id" value="<?= (int) $photo['id'] ?>">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+                                    <button type="submit" aria-label="Delete photo <?= (int) $photo['id'] ?>">Delete</button>
+                                </form>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </aside>
+        </div>
     </main>
 
     <footer class="site-footer">

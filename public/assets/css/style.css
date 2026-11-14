@@ -170,6 +170,7 @@ main {
 .photo-card img {
     display: block;
     width: 100%;
+    height: auto;
     aspect-ratio: 4 / 3;
     object-fit: cover;
 }
@@ -550,6 +551,109 @@ main {
 .editor-page {
     max-width: 68rem;
     padding-block: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.editor-workspace {
+    display: grid;
+    align-items: start;
+    gap: 1.5rem;
+}
+
+.editor-main,
+.editor-sidebar {
+    min-width: 0;
+}
+
+.editor-sidebar {
+    padding: 1rem;
+    border: 1px solid #e8e5df;
+    border-radius: 1rem;
+    background: #fff;
+}
+
+.editor-sidebar h2 {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+}
+
+.editor-sidebar > p {
+    color: #62676f;
+    font-size: 0.9rem;
+}
+
+.personal-photo-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    max-height: 65vh;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.personal-photo {
+    overflow: hidden;
+    border: 1px solid #e8e5df;
+    border-radius: 0.6rem;
+}
+
+.personal-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
+.personal-photo form {
+    padding: 0.4rem;
+}
+
+.personal-photo button {
+    width: 100%;
+    padding: 0.35rem;
+    border: 1px solid #b83e2b;
+    border-radius: 0.4rem;
+    background: #fff;
+    color: #a02e23;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 650;
+}
+
+.personal-photo button:focus-visible {
+    outline: 3px solid #fa604a;
+    outline-offset: 2px;
+}
+
+.editor-notice {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.6rem;
+    background: #fff;
+}
+
+.editor-notice-success {
+    color: #245b38;
+    border: 1px solid #a9d3b7;
+}
+
+.editor-notice-error {
+    color: #a02e23;
+    border: 1px solid #eab7b0;
+}
+
+@media (min-width: 64rem) {
+    .editor-workspace {
+        grid-template-columns: minmax(0, 1fr) 18rem;
+    }
+
+    .editor-sidebar {
+        position: sticky;
+        top: 1rem;
+    }
 }
 
 .editor-heading {

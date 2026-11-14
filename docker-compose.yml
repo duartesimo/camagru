@@ -8,6 +8,7 @@ services:
     volumes:
       - ./public:/var/www/html/public:ro
       - ./src:/var/www/html/src:ro
+      - photo_data:/var/lib/camagru/photos
     environment:
       DB_HOST: db
       DB_NAME: ${POSTGRES_DB}
@@ -25,3 +26,4 @@ services:
 
 volumes:
   postgres_data:
+  photo_data:

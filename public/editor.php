@@ -77,7 +77,7 @@ try {
     <main class="container editor-page">
         <div class="editor-heading">
             <span class="register-pill">Photo editor</span>
-            <h1>Camera preview</h1>
+            <h1>Create a photo</h1>
             <p>Turn on your camera, choose an overlay, and take a photo.</p>
         </div>
 

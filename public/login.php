@@ -121,6 +121,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
                 <button class="submit-button" type="submit">Log in</button>
             </form>
+            <p class="auth-switch">Don't have an account? <a href="/register.php">Sign up</a></p>
         </section>
     </main>
 

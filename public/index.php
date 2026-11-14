@@ -116,7 +116,7 @@ try {
                         <?php $author = htmlspecialchars((string) $photo['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
                         <figure class="photo-card">
                             <img src="/photo.php?id=<?= (int) $photo['id'] ?>" alt="Photo shared by <?= $author ?>" width="640" height="480" loading="lazy">
-                            <figcaption>By <?= $author ?></figcaption>
+                            <figcaption>By <strong><?= $author ?></strong></figcaption>
                         </figure>
                     <?php endforeach; ?>
                 </div>

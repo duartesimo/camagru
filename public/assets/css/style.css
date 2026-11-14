@@ -105,7 +105,7 @@ main {
 
 /* Gallery styles */
 .intro {
-    padding-block: 4rem 3.5rem;
+    padding-block: 2.75rem 2rem;
 }
 
 .eyebrow {
@@ -118,20 +118,20 @@ main {
 
 .intro h1 {
     max-width: 16ch;
-    margin-top: 0.8rem;
-    font-size: clamp(2.4rem, 7vw, 4.5rem);
+    margin-top: 0.6rem;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
     line-height: 1.1;
     letter-spacing: -0.05em;
 }
 
 .intro-copy {
     max-width: 38rem;
-    margin-top: 1rem;
+    margin-top: 0.75rem;
     color: #62676f;
 }
 
 .gallery {
-    padding-bottom: 5rem;
+    padding-bottom: 4rem;
 }
 
 .section-heading {
@@ -140,7 +140,7 @@ main {
     align-items: baseline;
     justify-content: space-between;
     gap: 0.5rem 1rem;
-    padding-block: 1.5rem;
+    padding-block: 1.15rem;
     border-top: 1px solid #e9e6e1;
 }
 
@@ -177,8 +177,13 @@ main {
 
 .photo-card figcaption {
     padding: 0.8rem 1rem;
-    color: #62676f;
+    color: #565b63;
     font-size: 0.9rem;
+}
+
+.photo-card figcaption strong {
+    color: #202229;
+    font-weight: 650;
 }
 
 .gallery-empty {
@@ -200,11 +205,20 @@ main {
 }
 
 .gallery-pagination a {
-    padding: 0.45rem 0.8rem;
-    border: 1px solid #e9e6e1;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid #e0d9d3;
     border-radius: 0.5rem;
     background: #fff;
+    color: #a02e23;
+    font-weight: 650;
     text-decoration: none;
+}
+
+.gallery-pagination a:hover {
+    background: #fff4f1;
 }
 
 .gallery-pagination a:focus-visible {
@@ -214,6 +228,7 @@ main {
 
 .gallery-pagination span {
     color: #62676f;
+    font-weight: 600;
 }
 
 /* Registration */
@@ -221,7 +236,7 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: clamp(2.5rem, 5vw, 4.5rem) 1.25rem 5rem;
+    padding: clamp(2rem, 4vw, 3.25rem) 1.25rem 3.5rem;
     background:
         radial-gradient(ellipse at 0% 0%, #fff0ec 0%, transparent 28%),
         radial-gradient(ellipse at 100% 100%, #fff0eb 0%, transparent 31%),
@@ -230,7 +245,7 @@ main {
 
 .register-heading {
     max-width: 43rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     text-align: center;
 }
 
@@ -245,7 +260,7 @@ main {
 }
 
 .register-heading h1 {
-    margin-top: 1rem;
+    margin-top: 0.8rem;
     font-size: clamp(2.2rem, 5vw, 3.2rem);
     font-weight: 760;
     letter-spacing: -0.055em;
@@ -256,7 +271,7 @@ main {
     display: block;
     width: 4.25rem;
     height: 0.2rem;
-    margin: 0.7rem auto 0;
+    margin: 0.55rem auto 0;
     border-radius: 999px;
     background: #fa604a;
     content: "";
@@ -265,7 +280,7 @@ main {
 
 .register-heading>p {
     max-width: 39rem;
-    margin: 0.9rem auto 0;
+    margin: 0.75rem auto 0;
     color: #63666c;
     font-size: 1.05rem;
     line-height: 1.65;
@@ -280,42 +295,27 @@ main {
     box-shadow: 0 18px 45px rgb(65 48 40 / 9%);
 }
 
-.registration-note {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding: 0.85rem 1rem;
-    border-radius: 0.65rem;
-    background: #e8f7ee;
-    color: #205c38;
-}
-
-.note-icon {
-    display: grid;
-    width: 1.65rem;
-    height: 1.65rem;
-    flex-shrink: 0;
-    place-items: center;
-    border: 2px solid #247544;
-    border-radius: 50%;
-    font-family: Georgia, serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-}
-
-.registration-note strong {
-    font-size: 1rem;
-}
-
-.registration-note p {
-    color: #3d6250;
-    font-size: 0.85rem;
-}
-
 .register-panel form {
     display: grid;
-    gap: 1.1rem;
+    gap: 1rem;
+}
+
+.auth-switch {
+    margin-top: 1.25rem;
+    color: #62676f;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.auth-switch a {
+    color: #a02e23;
+    font-weight: 650;
+    text-underline-offset: 0.15em;
+}
+
+.auth-switch a:focus-visible {
+    outline: 3px solid #fa604a;
+    outline-offset: 3px;
 }
 
 .form-field {
@@ -565,14 +565,14 @@ main {
 }
 
 .editor-sidebar {
-    padding: 1rem;
+    padding: 1.25rem;
     border: 1px solid #e8e5df;
     border-radius: 1rem;
     background: #fff;
 }
 
 .editor-sidebar h2 {
-    margin: 0 0 1rem;
+    margin: 0 0 0.75rem;
     font-size: 1.25rem;
 }
 
@@ -612,15 +612,21 @@ main {
 
 .personal-photo button {
     width: 100%;
-    padding: 0.35rem;
-    border: 1px solid #b83e2b;
+    min-height: 2.25rem;
+    padding: 0.4rem;
+    border: 1px solid #e0d9d3;
     border-radius: 0.4rem;
     background: #fff;
-    color: #a02e23;
+    color: #6e4240;
     cursor: pointer;
     font: inherit;
     font-size: 0.8rem;
     font-weight: 650;
+}
+
+.personal-photo button:hover {
+    border-color: #b83e2b;
+    color: #a02e23;
 }
 
 .personal-photo button:focus-visible {
@@ -657,7 +663,7 @@ main {
 }
 
 .editor-heading {
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.5rem;
 }
 
 .editor-heading h1 {
@@ -772,10 +778,10 @@ main {
 
 .overlay-picker {
     min-inline-size: 0;
-    margin-top: 1.5rem;
-    padding: 1rem;
+    margin-top: 1rem;
+    padding: clamp(1rem, 3vw, 1.5rem);
     border: 1px solid #e8e5df;
-    border-radius: 0.75rem;
+    border-radius: 1rem;
     background: #fff;
 }
 

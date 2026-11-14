@@ -137,14 +137,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                     <a href="/" class="back-link">Back to gallery</a>
                 </div>
             <?php else: ?>
-                <div class="registration-note">
-                    <span class="note-icon" aria-hidden="true">i</span>
-                    <div>
-                        <strong>Almost there!</strong>
-                        <p>Fill in your details below to join Camagru.</p>
-                    </div>
-                </div>
-
                 <?php if (isset($errors['form'])): ?>
                     <p class="form-message-error" role="alert"><?= htmlspecialchars($errors['form'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
                 <?php endif; ?>
@@ -187,6 +179,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
                     <button class="submit-button" type="submit">Create account</button>
                 </form>
+                <p class="auth-switch">Already have an account? <a href="/login.php">Log in</a></p>
             <?php endif; ?>
         </section>
     </main>

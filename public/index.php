@@ -11,6 +11,45 @@ $isLoggedIn = isset($_SESSION['user_id'], $_SESSION['username'])
 if ($isLoggedIn && (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token']))) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+
+require_once __DIR__ . '/../src/database.php';
+
+$pageSize = 6;
+$page = 1;
+$pageInput = $_GET['page'] ?? null;
+if (is_string($pageInput) && preg_match('/\A[1-9][0-9]*\z/', $pageInput) === 1) {
+    $validPage = filter_var($pageInput, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1, 'max_range' => intdiv(PHP_INT_MAX, $pageSize)],
+    ]);
+    if ($validPage !== false) {
+        $page = $validPage;
+    }
+}
+
+$photos = [];
+$hasNextPage = false;
+$galleryError = false;
+
+try {
+    $statement = database_connection()->prepare(
+        'SELECT p.id, u.username
+         FROM photos p
+         JOIN users u ON u.id = p.user_id
+         ORDER BY p.created_at DESC, p.id DESC
+         LIMIT :limit OFFSET :offset'
+    );
+    $statement->bindValue(':limit', $pageSize + 1, PDO::PARAM_INT);
+    $statement->bindValue(':offset', ($page - 1) * $pageSize, PDO::PARAM_INT);
+    $statement->execute();
+    $photos = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    if (count($photos) > $pageSize) {
+        $hasNextPage = true;
+        array_pop($photos);
+    }
+} catch (PDOException | RuntimeException) {
+    $galleryError = true;
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -64,20 +103,36 @@ if ($isLoggedIn && (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csr
         <section class="gallery container" id="gallery" aria-labelledby="gallery-title">
             <div class="section-heading">
                 <h2 id="gallery-title">Explore the gallery</h2>
-                <p>Community photos will appear here soon.</p>
+                <p>Photos shared by the community.</p>
             </div>
 
-            <div class="photo-grid">
-                <div class="photo-card">
-                    <div class="photo-placeholder">Photo preview</div>
+            <?php if ($galleryError): ?>
+                <p class="gallery-empty" role="alert">The gallery is unavailable right now. Please try again later.</p>
+            <?php elseif ($photos === []): ?>
+                <p class="gallery-empty"><?= $page === 1 ? 'No photos have been shared yet.' : 'No photos on this page.' ?></p>
+            <?php else: ?>
+                <div class="photo-grid">
+                    <?php foreach ($photos as $photo): ?>
+                        <?php $author = htmlspecialchars((string) $photo['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
+                        <figure class="photo-card">
+                            <img src="/photo.php?id=<?= (int) $photo['id'] ?>" alt="Photo shared by <?= $author ?>" width="640" height="480" loading="lazy">
+                            <figcaption>By <?= $author ?></figcaption>
+                        </figure>
+                    <?php endforeach; ?>
                 </div>
-                <div class="photo-card">
-                    <div class="photo-placeholder">Photo preview</div>
-                </div>
-                <div class="photo-card">
-                    <div class="photo-placeholder">Photo preview</div>
-                </div>
-            </div>
+            <?php endif; ?>
+
+            <?php if (!$galleryError && ($page > 1 || $hasNextPage)): ?>
+                <nav class="gallery-pagination" aria-label="Gallery pages">
+                    <?php if ($page > 1): ?>
+                        <a href="/?page=<?= $page - 1 ?>#gallery" rel="prev">Previous</a>
+                    <?php endif; ?>
+                    <span>Page <?= $page ?></span>
+                    <?php if ($hasNextPage): ?>
+                        <a href="/?page=<?= $page + 1 ?>#gallery" rel="next">Next</a>
+                    <?php endif; ?>
+                </nav>
+            <?php endif; ?>
         </section>
     </main>
 

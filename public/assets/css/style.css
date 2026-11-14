@@ -161,18 +161,58 @@ main {
 
 .photo-card {
     overflow: hidden;
+    margin: 0;
     border: 1px solid #e9e6e1;
     border-radius: 0.9rem;
     background: #fff;
 }
 
-.photo-placeholder {
-    display: grid;
+.photo-card img {
+    display: block;
+    width: 100%;
     aspect-ratio: 4 / 3;
-    place-items: center;
-    background: #efede9;
-    color: #777;
+    object-fit: cover;
+}
+
+.photo-card figcaption {
+    padding: 0.8rem 1rem;
+    color: #62676f;
     font-size: 0.9rem;
+}
+
+.gallery-empty {
+    padding: 1.5rem;
+    border: 1px solid #e9e6e1;
+    border-radius: 0.9rem;
+    background: #fff;
+    color: #62676f;
+}
+
+.gallery-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.gallery-pagination a {
+    padding: 0.45rem 0.8rem;
+    border: 1px solid #e9e6e1;
+    border-radius: 0.5rem;
+    background: #fff;
+    text-decoration: none;
+}
+
+.gallery-pagination a:focus-visible {
+    outline: 3px solid #fa604a;
+    outline-offset: 2px;
+}
+
+.gallery-pagination span {
+    color: #62676f;
 }
 
 /* Registration */

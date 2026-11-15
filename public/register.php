@@ -10,6 +10,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 require_once __DIR__ . '/../src/database.php';
+require_once __DIR__ . '/../src/email.php';
 
 if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -61,31 +62,56 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         }
 
         if ($errors === []) {
+            $database = null;
             try {
                 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
                 if ($passwordHash === false) {
                     throw new RuntimeException('Password hashing failed.');
                 }
 
-                $statement = database_connection()->prepare(
-                    'INSERT INTO users (username, email, password_hash) VALUES (:username, :email, :password_hash)'
+                $token = bin2hex(random_bytes(32));
+                $database = database_connection();
+                $database->beginTransaction();
+
+                $statement = $database->prepare(
+                    'INSERT INTO users (username, email, password_hash)
+                     VALUES (:username, :email, :password_hash)
+                     RETURNING id'
                 );
                 $statement->execute([
                     'username' => $username,
                     'email' => $email,
                     'password_hash' => $passwordHash,
                 ]);
+                $userId = (int) $statement->fetchColumn();
 
-                $_SESSION['registration_success'] = 'Account created successfully. Your email is not verified yet.';
+                $statement = $database->prepare(
+                    "INSERT INTO email_verification_tokens (user_id, token_hash, expires_at)
+                     VALUES (:user_id, :token_hash, CURRENT_TIMESTAMP + INTERVAL '24 hours')"
+                );
+                $statement->execute([
+                    'user_id' => $userId,
+                    'token_hash' => hash('sha256', $token),
+                ]);
+
+                if (!send_verification_email($email, $token)) {
+                    throw new RuntimeException('Email delivery failed.');
+                }
+
+                $database->commit();
+
+                $_SESSION['registration_success'] = 'Account created. Check your email for a verification link before logging in.';
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                 header('Location: /register.php', true, 303);
                 exit;
-            } catch (PDOException $exception) {
-                $errors['form'] = $exception->getCode() === '23505'
+            } catch (Throwable $exception) {
+                if ($database instanceof PDO && $database->inTransaction()) {
+                    $database->rollBack();
+                }
+
+                $errors['form'] = $exception instanceof PDOException && $exception->getCode() === '23505'
                     ? 'That username or email is already registered.'
-                    : 'Registration is unavailable right now. Please try again later.';
-            } catch (RuntimeException) {
-                $errors['form'] = 'Registration is unavailable right now. Please try again later.';
+                    : 'Could not create the account or send its verification email. Please try again later.';
             }
         }
     }

@@ -12,57 +12,129 @@ if (isset($_SESSION['user_id'], $_SESSION['username'])
 }
 
 require_once __DIR__ . '/../src/database.php';
+require_once __DIR__ . '/../src/email.php';
 
 if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 $identity = '';
+$resendEmail = '';
 $error = '';
+$resendNotice = $_SESSION['resend_notice'] ?? '';
+unset($_SESSION['resend_notice']);
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
-    $identityInput = $_POST['identity'] ?? null;
-    $passwordInput = $_POST['password'] ?? null;
     $tokenInput = $_POST['csrf_token'] ?? null;
-
-    $identity = is_string($identityInput) ? trim($identityInput) : '';
-    $password = is_string($passwordInput) ? $passwordInput : '';
+    $formAction = $_POST['form_action'] ?? 'login';
 
     if (!is_string($tokenInput) || !hash_equals($_SESSION['csrf_token'], $tokenInput)) {
         $error = 'Your session expired. Please try again.';
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    } elseif ($identity === '' || $password === '') {
-        $error = 'Invalid email, username or password.';
-    } else {
-        try {
-            $statement = database_connection()->prepare(
-                'SELECT id, username, password_hash, email_verified_at
-                 FROM users
-                 WHERE username = :username OR email = :email
-                 LIMIT 1'
-            );
-            $statement->execute([
-                'username' => $identity,
-                'email' => strtolower($identity),
-            ]);
-            $user = $statement->fetch();
+    } elseif ($formAction === 'resend') {
+        $emailInput = $_POST['resend_email'] ?? null;
+        $resendEmail = is_string($emailInput) ? strtolower(trim($emailInput)) : '';
 
-            // TODO: Require email_verified_at to be non-NULL when email verification is implemented.
-            if (is_array($user) && password_verify($password, $user['password_hash'])) {
-                if (!session_regenerate_id(true)) {
-                    throw new RuntimeException('Could not renew the session.');
+        if (strlen($resendEmail) > 254 || filter_var($resendEmail, FILTER_VALIDATE_EMAIL) === false) {
+            $error = 'Enter a valid email address to request a verification link.';
+        } else {
+            // Use the same neutral notice for every valid request. A distinct mail
+            // error would reveal which addresses have unverified accounts.
+            $_SESSION['resend_notice'] = 'Request received. If this address has an unverified account, check your inbox for a link. If none arrives, try again later. Please wait one minute between requests.';
+            $database = null;
+            try {
+                $database = database_connection();
+                $database->beginTransaction();
+
+                $statement = $database->prepare(
+                    'SELECT id, email FROM users
+                     WHERE email = :email AND email_verified_at IS NULL
+                     FOR UPDATE'
+                );
+                $statement->execute(['email' => $resendEmail]);
+                $user = $statement->fetch();
+
+                if (is_array($user)) {
+                    $token = bin2hex(random_bytes(32));
+                    $statement = $database->prepare(
+                        "INSERT INTO email_verification_tokens (user_id, token_hash, expires_at)
+                         VALUES (:user_id, :token_hash, CURRENT_TIMESTAMP + INTERVAL '24 hours')
+                         ON CONFLICT (user_id) DO UPDATE SET
+                             token_hash = EXCLUDED.token_hash,
+                             expires_at = EXCLUDED.expires_at,
+                             created_at = CURRENT_TIMESTAMP
+                         WHERE email_verification_tokens.created_at <= CURRENT_TIMESTAMP - INTERVAL '60 seconds'
+                         RETURNING user_id"
+                    );
+                    $statement->execute([
+                        'user_id' => (int) $user['id'],
+                        'token_hash' => hash('sha256', $token),
+                    ]);
+
+                    if ($statement->fetchColumn() !== false
+                        && !send_verification_email($user['email'], $token)) {
+                        throw new RuntimeException('Email delivery failed.');
+                    }
                 }
 
-                $_SESSION['user_id'] = (int) $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-                header('Location: /', true, 303);
-                exit;
+                $database->commit();
+            } catch (Throwable) {
+                if ($database instanceof PDO) {
+                    try {
+                        if ($database->inTransaction()) {
+                            $database->rollBack();
+                        }
+                    } catch (Throwable) {
+                        // The connection may already be unavailable.
+                    }
+                }
             }
 
+            header('Location: /login.php', true, 303);
+            exit;
+        }
+    } else {
+        $identityInput = $_POST['identity'] ?? null;
+        $passwordInput = $_POST['password'] ?? null;
+        $identity = is_string($identityInput) ? trim($identityInput) : '';
+        $password = is_string($passwordInput) ? $passwordInput : '';
+
+        if ($identity === '' || $password === '') {
             $error = 'Invalid email, username or password.';
-        } catch (PDOException | RuntimeException) {
-            $error = 'Login is unavailable right now. Please try again later.';
+        } else {
+            try {
+                $statement = database_connection()->prepare(
+                    'SELECT id, username, password_hash, email_verified_at
+                     FROM users
+                     WHERE username = :username OR email = :email
+                     LIMIT 1'
+                );
+                $statement->execute([
+                    'username' => $identity,
+                    'email' => strtolower($identity),
+                ]);
+                $user = $statement->fetch();
+
+                if (is_array($user) && password_verify($password, $user['password_hash'])) {
+                    if ($user['email_verified_at'] === null) {
+                        $error = 'Verify your email before logging in. You can request a new link below.';
+                    } else {
+                        if (!session_regenerate_id(true)) {
+                            throw new RuntimeException('Could not renew the session.');
+                        }
+
+                        $_SESSION['user_id'] = (int) $user['id'];
+                        $_SESSION['username'] = $user['username'];
+                        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                        header('Location: /', true, 303);
+                        exit;
+                    }
+                } else {
+                    $error = 'Invalid email, username or password.';
+                }
+            } catch (PDOException | RuntimeException) {
+                $error = 'Login is unavailable right now. Please try again later.';
+            }
         }
     }
 }
@@ -105,6 +177,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             <?php if ($error !== ''): ?>
                 <p class="form-message-error" role="alert"><?= htmlspecialchars($error, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
             <?php endif; ?>
+            <?php if (is_string($resendNotice) && $resendNotice !== ''): ?>
+                <p class="form-message-notice" role="status"><?= htmlspecialchars($resendNotice, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
+            <?php endif; ?>
 
             <form method="post" action="/login.php">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
@@ -122,6 +197,19 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                 <button class="submit-button" type="submit">Log in</button>
             </form>
             <p class="auth-switch">Don't have an account? <a href="/register.php">Sign up</a></p>
+
+            <section class="resend-verification" aria-labelledby="resend-title">
+                <h2 id="resend-title">Need another verification link?</h2>
+                <form method="post" action="/login.php">
+                    <input type="hidden" name="form_action" value="resend">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+                    <div class="form-field">
+                        <label for="resend-email">Email address</label>
+                        <input id="resend-email" name="resend_email" type="email" autocomplete="email" required maxlength="254" value="<?= htmlspecialchars($resendEmail, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+                    </div>
+                    <button class="submit-button" type="submit">Resend verification email</button>
+                </form>
+            </section>
         </section>
     </main>
 

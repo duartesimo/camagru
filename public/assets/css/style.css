@@ -376,6 +376,37 @@ main {
     font-size: 0.9rem;
 }
 
+.form-message-notice {
+    margin-bottom: 1.2rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid #e9e6e1;
+    border-radius: 0.65rem;
+    background: #fff;
+    color: #565b63;
+    font-size: 0.9rem;
+}
+
+.resend-verification {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9e6e1;
+}
+
+.resend-verification h2 {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.resend-verification .submit-button {
+    border: 1px solid #d8d5d0;
+    background: #fff;
+    color: #a02e23;
+}
+
+.resend-verification .submit-button:hover {
+    background: #fff4f1;
+}
+
 .submit-button,
 .back-link {
     display: inline-flex;

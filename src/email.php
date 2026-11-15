@@ -18,7 +18,7 @@ function send_email(string $to, string $subject, string $body): bool
     ]);
 }
 
-function send_verification_email(string $to, string $token): bool
+function application_base_url(): string|false
 {
     $baseUrl = getenv('APP_URL');
     if (!is_string($baseUrl) || filter_var($baseUrl, FILTER_VALIDATE_URL) === false) {
@@ -33,10 +33,35 @@ function send_verification_email(string $to, string $token): bool
         return false;
     }
 
-    $link = rtrim($baseUrl, '/') . '/verify_email.php?token=' . $token;
+    return rtrim($baseUrl, '/');
+}
+
+function send_verification_email(string $to, string $token): bool
+{
+    $baseUrl = application_base_url();
+    if ($baseUrl === false) {
+        return false;
+    }
+
+    $link = $baseUrl . '/verify_email.php?token=' . $token;
     $body = "Welcome to Camagru!\n\n"
         . "Open this link to verify your email address:\n{$link}\n\n"
         . "This link expires in 24 hours. If you did not create an account, ignore this email.\n";
 
     return send_email($to, 'Verify your Camagru account', $body);
+}
+
+function send_password_reset_email(string $to, string $token): bool
+{
+    $baseUrl = application_base_url();
+    if ($baseUrl === false) {
+        return false;
+    }
+
+    $link = $baseUrl . '/reset_password.php?token=' . $token;
+    $body = "A password reset was requested for your Camagru account.\n\n"
+        . "Open this link to set a new password:\n{$link}\n\n"
+        . "This link expires in 1 hour. If you did not request a reset, ignore this email.\n";
+
+    return send_email($to, 'Reset your Camagru password', $body);
 }

@@ -14,6 +14,13 @@ services:
       DB_NAME: ${POSTGRES_DB}
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@camagru.test}
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:8025:8025"
 
   db:
     image: postgres:17

@@ -689,6 +689,80 @@ main {
     font-size: 1.25rem;
 }
 
+.photo-source-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    min-inline-size: 0;
+    margin: 0 0 1rem;
+    padding: 0;
+    border: 0;
+}
+
+.photo-source-picker legend {
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+}
+
+.photo-source-picker label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.photo-source-picker input {
+    accent-color: #fa604a;
+}
+
+.upload-controls {
+    display: grid;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.upload-controls[hidden],
+.camera-buttons[hidden] {
+    display: none;
+}
+
+.upload-controls label {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.upload-controls input {
+    max-width: 100%;
+    font: inherit;
+    font-size: 0.9rem;
+}
+
+.upload-controls input::file-selector-button {
+    margin-right: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d8d5d0;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #24272d;
+    cursor: pointer;
+    font: inherit;
+}
+
+.upload-controls input::file-selector-button:hover {
+    background: #f4f2ee;
+}
+
+.upload-controls input:focus-visible {
+    outline: 3px solid #fa604a;
+    outline-offset: 3px;
+}
+
+.upload-controls p {
+    color: #62676f;
+    font-size: 0.8rem;
+}
+
 #camera-preview {
     display: block;
     width: 100%;
@@ -706,11 +780,21 @@ main {
     margin-top: 1.25rem;
 }
 
+.camera-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
 .camera-controls .submit-button,
 .camera-stop-button {
     width: auto;
     min-height: 2.9rem;
     padding: 0.7rem 1rem;
+}
+
+.camera-controls .submit-button {
+    margin-top: 0;
 }
 
 .camera-stop-button {
@@ -751,7 +835,8 @@ main {
     background: #20252b;
 }
 
-.camera-frame > #camera-preview {
+.camera-frame > #camera-preview,
+.camera-frame > #upload-preview {
     position: absolute;
     inset: 0;
     display: block;
@@ -761,6 +846,11 @@ main {
     aspect-ratio: auto;
     border-radius: 0;
     object-fit: cover;
+}
+
+.camera-frame > #camera-preview[hidden],
+.camera-frame > #upload-preview[hidden] {
+    display: none;
 }
 
 .camera-overlay {

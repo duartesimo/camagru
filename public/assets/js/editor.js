@@ -1,6 +1,12 @@
 'use strict';
 
 const video = document.querySelector('#camera-preview');
+const uploadPreview = document.querySelector('#upload-preview');
+const uploadInput = document.querySelector('#upload-image');
+const uploadControls = document.querySelector('#upload-controls');
+const webcamOption = document.querySelector('#source-webcam');
+const uploadOption = document.querySelector('#source-upload');
+const cameraButtons = document.querySelector('#camera-buttons');
 const startButton = document.querySelector('#start-camera');
 const stopButton = document.querySelector('#stop-camera');
 const statusMessage = document.querySelector('#camera-status');
@@ -9,18 +15,30 @@ const captureMessage = document.querySelector('#capture-message');
 const captureResult = document.querySelector('#capture-result');
 const finalPhoto = document.querySelector('#final-photo');
 const captureSuccess = document.querySelector('#capture-success');
+const selectedOverlayImage = document.querySelector('#camera-overlay');
+const overlayInputs = document.querySelectorAll('.overlay-radio');
+const clearOverlayButton = document.querySelector('#clear-overlay');
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
+let sourceMode = 'webcam';
 let cameraStream = null;
+let cameraRequestId = 0;
+let uploadedImage = null;
+let uploadedImageUrl = null;
+let uploadLoadId = 0;
 let captureBusy = false;
 let photoUrl = null;
 
 function updateTakePhotoButton() {
     const overlaySelected = document.querySelector('.overlay-radio:checked') !== null;
-    takePhotoButton.disabled = cameraStream === null || stopButton.disabled || !overlaySelected || captureBusy;
+    const sourceReady = sourceMode === 'upload'
+        ? uploadedImage !== null
+        : cameraStream !== null && !stopButton.disabled;
+    takePhotoButton.disabled = !sourceReady || !overlaySelected || captureBusy;
 }
 
 function stopCamera() {
+    cameraRequestId++;
     if (cameraStream !== null) {
         cameraStream.getTracks().forEach((track) => track.stop());
         cameraStream = null;
@@ -30,7 +48,27 @@ function stopCamera() {
     video.srcObject = null;
     startButton.disabled = false;
     stopButton.disabled = true;
-    statusMessage.textContent = 'Camera is off.';
+    if (sourceMode === 'webcam') {
+        statusMessage.textContent = 'Camera is off.';
+    }
+    updateTakePhotoButton();
+}
+
+function setSourceMode(mode) {
+    sourceMode = mode;
+    if (mode === 'upload') {
+        stopCamera();
+    }
+
+    cameraButtons.hidden = mode !== 'webcam';
+    uploadControls.hidden = mode !== 'upload';
+    video.hidden = mode !== 'webcam';
+    uploadPreview.hidden = mode !== 'upload' || uploadedImage === null;
+    takePhotoButton.textContent = mode === 'webcam' ? 'Take photo' : 'Create photo';
+    statusMessage.textContent = mode === 'upload'
+        ? (uploadedImage === null ? 'Choose an image to preview.' : 'Using an uploaded image.')
+        : (cameraStream === null ? 'Camera is off.' : 'Camera is on.');
+    captureMessage.hidden = true;
     updateTakePhotoButton();
 }
 
@@ -40,17 +78,39 @@ async function startCamera() {
         return;
     }
 
+    const requestId = ++cameraRequestId;
     startButton.disabled = true;
     statusMessage.textContent = 'Requesting camera access…';
+    let stream = null;
 
     try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        video.srcObject = cameraStream;
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        if (requestId !== cameraRequestId || sourceMode !== 'webcam') {
+            stream.getTracks().forEach((track) => track.stop());
+            return;
+        }
+
+        cameraStream = stream;
+        video.srcObject = stream;
         await video.play();
+        if (requestId !== cameraRequestId || sourceMode !== 'webcam') {
+            if (cameraStream === stream) {
+                stopCamera();
+            }
+            return;
+        }
+
         stopButton.disabled = false;
         statusMessage.textContent = 'Camera is on.';
         updateTakePhotoButton();
     } catch (error) {
+        if (requestId !== cameraRequestId || sourceMode !== 'webcam') {
+            if (cameraStream === stream) {
+                stopCamera();
+            }
+            return;
+        }
+
         stopCamera();
         statusMessage.textContent = error && error.name === 'NotAllowedError'
             ? 'Camera permission was denied. Allow access in your browser and try again.'
@@ -58,13 +118,85 @@ async function startCamera() {
     }
 }
 
+function clearUploadedImage() {
+    uploadLoadId++;
+    uploadedImage = null;
+    uploadPreview.hidden = true;
+    uploadPreview.removeAttribute('src');
+    if (uploadedImageUrl !== null) {
+        URL.revokeObjectURL(uploadedImageUrl);
+        uploadedImageUrl = null;
+    }
+    updateTakePhotoButton();
+}
+
+function showUploadError(message) {
+    clearUploadedImage();
+    uploadInput.value = '';
+    statusMessage.textContent = 'Choose an image to preview.';
+    captureMessage.textContent = message;
+    captureMessage.hidden = false;
+}
+
+function handleUploadSelection() {
+    const file = uploadInput.files[0];
+    clearUploadedImage();
+    captureMessage.hidden = true;
+    statusMessage.textContent = 'Choose an image to preview.';
+
+    if (!file) {
+        return;
+    }
+    if (file.type !== 'image/png' && file.type !== 'image/jpeg') {
+        showUploadError('Choose a PNG or JPEG image.');
+        return;
+    }
+    if (file.size === 0 || file.size > 10 * 1024 * 1024) {
+        showUploadError('Choose an image under 10 MB.');
+        return;
+    }
+
+    const loadId = uploadLoadId;
+    statusMessage.textContent = 'Loading image…';
+    try {
+        uploadedImageUrl = URL.createObjectURL(file);
+    } catch {
+        showUploadError('Could not read this image. Choose another file.');
+        return;
+    }
+
+    const image = new Image();
+    image.onload = () => {
+        if (loadId !== uploadLoadId) {
+            return;
+        }
+        if (image.naturalWidth === 0 || image.naturalHeight === 0
+            || image.naturalWidth * image.naturalHeight > 24 * 1000 * 1000) {
+            showUploadError('Choose an image of 24 megapixels or less.');
+            return;
+        }
+
+        uploadedImage = image;
+        uploadPreview.src = uploadedImageUrl;
+        uploadPreview.hidden = sourceMode !== 'upload';
+        if (sourceMode === 'upload') {
+            statusMessage.textContent = 'Using an uploaded image.';
+        }
+        updateTakePhotoButton();
+    };
+    image.onerror = () => {
+        if (loadId === uploadLoadId) {
+            showUploadError('Could not read this image. Choose another file.');
+        }
+    };
+    image.src = uploadedImageUrl;
+}
+
+webcamOption.addEventListener('change', () => setSourceMode('webcam'));
+uploadOption.addEventListener('change', () => setSourceMode('upload'));
+uploadInput.addEventListener('change', handleUploadSelection);
 startButton.addEventListener('click', startCamera);
 stopButton.addEventListener('click', stopCamera);
-window.addEventListener('pagehide', stopCamera);
-
-const selectedOverlayImage = document.querySelector('#camera-overlay');
-const overlayInputs = document.querySelectorAll('.overlay-radio');
-const clearOverlayButton = document.querySelector('#clear-overlay');
 
 overlayInputs.forEach((input) => {
     input.addEventListener('change', () => {
@@ -89,20 +221,24 @@ clearOverlayButton.addEventListener('click', () => {
 
 async function takePhoto() {
     const selectedOverlay = document.querySelector('.overlay-radio:checked');
-    if (cameraStream === null || stopButton.disabled || selectedOverlay === null) {
+    const isUpload = sourceMode === 'upload';
+    const source = isUpload ? uploadedImage : video;
+    if (selectedOverlay === null || captureBusy
+        || (isUpload ? source === null : cameraStream === null || stopButton.disabled)) {
         return;
     }
 
+    const overlayName = selectedOverlay.value;
     captureBusy = true;
     updateTakePhotoButton();
     captureMessage.hidden = true;
     captureSuccess.hidden = true;
 
     try {
-        const sourceWidth = video.videoWidth;
-        const sourceHeight = video.videoHeight;
+        const sourceWidth = isUpload ? source.naturalWidth : video.videoWidth;
+        const sourceHeight = isUpload ? source.naturalHeight : video.videoHeight;
         if (sourceWidth === 0 || sourceHeight === 0) {
-            throw new Error('Camera frame unavailable.');
+            throw new Error('Image frame unavailable.');
         }
 
         const canvas = document.createElement('canvas');
@@ -123,7 +259,7 @@ async function takePhoto() {
         }
 
         context.drawImage(
-            video,
+            source,
             (sourceWidth - cropWidth) / 2,
             (sourceHeight - cropHeight) / 2,
             cropWidth,
@@ -141,7 +277,7 @@ async function takePhoto() {
 
         const formData = new FormData();
         formData.append('photo', photo, 'capture.png');
-        formData.append('overlay', selectedOverlay.value);
+        formData.append('overlay', overlayName);
         formData.append('csrf_token', csrfToken);
 
         const response = await fetch('/capture.php', {
@@ -164,11 +300,11 @@ async function takePhoto() {
         }
         photoUrl = URL.createObjectURL(result);
         finalPhoto.src = photoUrl;
-        finalPhoto.alt = `Captured photo with ${selectedOverlay.value} overlay`;
+        finalPhoto.alt = `Photo with ${overlayName} overlay`;
         captureResult.hidden = false;
         captureSuccess.hidden = false;
     } catch {
-        captureMessage.textContent = 'Could not capture or process the photo. Please try again.';
+        captureMessage.textContent = 'Could not create or save the photo. Please try again.';
         captureMessage.hidden = false;
     } finally {
         captureBusy = false;
@@ -178,6 +314,8 @@ async function takePhoto() {
 
 takePhotoButton.addEventListener('click', takePhoto);
 window.addEventListener('pagehide', () => {
+    stopCamera();
+    clearUploadedImage();
     if (photoUrl !== null) {
         URL.revokeObjectURL(photoUrl);
     }

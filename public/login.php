@@ -23,6 +23,8 @@ $resendEmail = '';
 $error = '';
 $resendNotice = $_SESSION['resend_notice'] ?? '';
 unset($_SESSION['resend_notice']);
+$emailChangeNotice = $_SESSION['email_change_notice'] ?? false;
+unset($_SESSION['email_change_notice']);
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $tokenInput = $_POST['csrf_token'] ?? null;
@@ -174,6 +176,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         </div>
 
         <section class="register-panel" aria-label="Login">
+            <?php if ($emailChangeNotice === true): ?>
+                <p class="form-message-notice" role="status">Your email address changed. Verify the new address before logging in again.</p>
+            <?php endif; ?>
             <?php if ($error !== ''): ?>
                 <p class="form-message-error" role="alert"><?= htmlspecialchars($error, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
             <?php endif; ?>

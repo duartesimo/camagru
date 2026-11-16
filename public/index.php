@@ -76,6 +76,7 @@ try {
                 <a class="nav-active" href="/" aria-current="page">Gallery</a>
                 <?php if ($isLoggedIn): ?>
                     <a href="/editor.php">Editor</a>
+                    <a href="/settings.php">Settings</a>
                     <span class="nav-username">
                         Welcome, <strong><?= htmlspecialchars($_SESSION['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></strong>
                     </span>

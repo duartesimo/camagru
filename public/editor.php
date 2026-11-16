@@ -63,6 +63,7 @@ try {
             <nav class="site-nav" aria-label="Main navigation">
                 <a href="/">Gallery</a>
                 <a class="nav-active" href="/editor.php" aria-current="page">Editor</a>
+                <a href="/settings.php">Settings</a>
                 <span class="nav-username">
                     Welcome, <strong><?= htmlspecialchars($_SESSION['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></strong>
                 </span>

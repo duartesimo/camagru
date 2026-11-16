@@ -32,12 +32,21 @@ $galleryError = false;
 
 try {
     $statement = database_connection()->prepare(
-        'SELECT p.id, u.username
-         FROM photos p
+        'SELECT p.id, u.username,
+                COUNT(l.user_id) AS like_count,
+                MAX(CASE WHEN l.user_id = :viewer_id THEN 1 ELSE 0 END) AS liked_by_me
+         FROM (
+             SELECT id, user_id, created_at
+             FROM photos
+             ORDER BY created_at DESC, id DESC
+             LIMIT :limit OFFSET :offset
+         ) p
          JOIN users u ON u.id = p.user_id
-         ORDER BY p.created_at DESC, p.id DESC
-         LIMIT :limit OFFSET :offset'
+         LEFT JOIN likes l ON l.photo_id = p.id
+         GROUP BY p.id, p.created_at, u.username
+         ORDER BY p.created_at DESC, p.id DESC'
     );
+    $statement->bindValue(':viewer_id', $isLoggedIn ? $_SESSION['user_id'] : 0, PDO::PARAM_INT);
     $statement->bindValue(':limit', $pageSize + 1, PDO::PARAM_INT);
     $statement->bindValue(':offset', ($page - 1) * $pageSize, PDO::PARAM_INT);
     $statement->execute();
@@ -114,10 +123,27 @@ try {
             <?php else: ?>
                 <div class="photo-grid">
                     <?php foreach ($photos as $photo): ?>
-                        <?php $author = htmlspecialchars((string) $photo['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
+                        <?php
+                        $author = htmlspecialchars((string) $photo['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                        $likeCount = (int) $photo['like_count'];
+                        $likedByMe = (int) $photo['liked_by_me'] === 1;
+                        ?>
                         <figure class="photo-card">
                             <img src="/photo.php?id=<?= (int) $photo['id'] ?>" alt="Photo shared by <?= $author ?>" width="640" height="480" loading="lazy">
-                            <figcaption>By <strong><?= $author ?></strong></figcaption>
+                            <figcaption>
+                                <span>By <strong><?= $author ?></strong></span>
+                                <div class="photo-likes">
+                                    <span>❤️ <strong><?= $likeCount ?></strong> </span>
+                                    <?php if ($isLoggedIn): ?>
+                                        <form action="/like.php" method="post">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+                                            <input type="hidden" name="photo_id" value="<?= (int) $photo['id'] ?>">
+                                            <input type="hidden" name="page" value="<?= $page ?>">
+                                            <button type="submit" aria-pressed="<?= $likedByMe ? 'true' : 'false' ?>"><?= $likedByMe ? '♥ Unlike' : '♡ Like' ?></button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+                            </figcaption>
                         </figure>
                     <?php endforeach; ?>
                 </div>

@@ -176,6 +176,11 @@ main {
 }
 
 .photo-card figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
     padding: 0.8rem 1rem;
     color: #565b63;
     font-size: 0.9rem;
@@ -184,6 +189,34 @@ main {
 .photo-card figcaption strong {
     color: #202229;
     font-weight: 650;
+}
+
+.photo-likes {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.photo-likes button {
+    min-height: 2rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #e0d9d3;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #a02e23;
+    font: inherit;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.photo-likes button:hover,
+.photo-likes button[aria-pressed="true"] {
+    background: #fff4f1;
+}
+
+.photo-likes button:focus-visible {
+    outline: 3px solid #fa604a;
+    outline-offset: 2px;
 }
 
 .gallery-empty {

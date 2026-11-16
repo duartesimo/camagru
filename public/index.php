@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 session_start();
 
+$commentErrorPhotoId = $_SESSION['comment_error_photo_id'] ?? null;
+unset($_SESSION['comment_error_photo_id']);
+
 $isLoggedIn = isset($_SESSION['user_id'], $_SESSION['username'])
     && is_int($_SESSION['user_id'])
     && is_string($_SESSION['username']);
@@ -27,11 +30,13 @@ if (is_string($pageInput) && preg_match('/\A[1-9][0-9]*\z/', $pageInput) === 1) 
 }
 
 $photos = [];
+$commentsByPhoto = [];
 $hasNextPage = false;
 $galleryError = false;
 
 try {
-    $statement = database_connection()->prepare(
+    $database = database_connection();
+    $statement = $database->prepare(
         'SELECT p.id, u.username,
                 COUNT(l.user_id) AS like_count,
                 MAX(CASE WHEN l.user_id = :viewer_id THEN 1 ELSE 0 END) AS liked_by_me
@@ -55,6 +60,24 @@ try {
     if (count($photos) > $pageSize) {
         $hasNextPage = true;
         array_pop($photos);
+    }
+
+    if ($photos !== []) {
+        $placeholders = implode(', ', array_fill(0, count($photos), '?'));
+        $commentsStatement = $database->prepare(
+            'SELECT c.photo_id, c.content, c.created_at, u.username
+             FROM comments c
+             JOIN users u ON u.id = c.user_id
+             WHERE c.photo_id IN (' . $placeholders . ')
+             ORDER BY c.photo_id, c.created_at, c.id'
+        );
+        foreach ($photos as $index => $photo) {
+            $commentsStatement->bindValue($index + 1, (int) $photo['id'], PDO::PARAM_INT);
+        }
+        $commentsStatement->execute();
+        while ($comment = $commentsStatement->fetch(PDO::FETCH_ASSOC)) {
+            $commentsByPhoto[(int) $comment['photo_id']][] = $comment;
+        }
     }
 } catch (PDOException | RuntimeException) {
     $galleryError = true;
@@ -128,7 +151,7 @@ try {
                         $likeCount = (int) $photo['like_count'];
                         $likedByMe = (int) $photo['liked_by_me'] === 1;
                         ?>
-                        <figure class="photo-card">
+                        <figure class="photo-card" id="photo-<?= (int) $photo['id'] ?>">
                             <img src="/photo.php?id=<?= (int) $photo['id'] ?>" alt="Photo shared by <?= $author ?>" width="640" height="480" loading="lazy">
                             <figcaption>
                                 <span>By <strong><?= $author ?></strong></span>
@@ -143,6 +166,43 @@ try {
                                         </form>
                                     <?php endif; ?>
                                 </div>
+                                <section class="photo-comments" aria-label="Comments on this photo">
+                                    <h3>Comments</h3>
+                                    <?php if (empty($commentsByPhoto[(int) $photo['id']])): ?>
+                                        <p>No comments yet.</p>
+                                    <?php else: ?>
+                                        <ul class="comment-list">
+                                            <?php foreach ($commentsByPhoto[(int) $photo['id']] as $comment): ?>
+                                                <?php $commentDate = (new DateTimeImmutable((string) $comment['created_at']))
+                                                    ->setTimezone(new DateTimeZone('Europe/Madrid')); ?>
+                                                <li>
+                                                    <div class="comment-meta">
+                                                        <strong><?= htmlspecialchars((string) $comment['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></strong>
+                                                        <time datetime="<?= htmlspecialchars($commentDate->format(DATE_ATOM), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"><?= htmlspecialchars($commentDate->format('d/m/Y, H:i'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></time>
+                                                    </div>
+                                                    <p><?= htmlspecialchars((string) $comment['content'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    <?php endif; ?>
+
+                                    <?php if ($isLoggedIn): ?>
+                                        <?php $hasCommentError = $commentErrorPhotoId === (int) $photo['id']; ?>
+                                        <form action="/comment.php" method="post">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
+                                            <input type="hidden" name="photo_id" value="<?= (int) $photo['id'] ?>">
+                                            <input type="hidden" name="page" value="<?= $page ?>">
+                                            <div class="form-field">
+                                                <label for="comment-<?= (int) $photo['id'] ?>">Your comment</label>
+                                                <textarea id="comment-<?= (int) $photo['id'] ?>" name="content" aria-describedby="comment-hint-<?= (int) $photo['id'] ?><?= $hasCommentError ? ' comment-error-' . (int) $photo['id'] : '' ?>" <?= $hasCommentError ? 'aria-invalid="true"' : '' ?> required></textarea>
+                                                <?php if ($hasCommentError): ?>
+                                                    <p class="field-error" id="comment-error-<?= (int) $photo['id'] ?>" role="alert">Enter a comment of 1 to 500 characters.</p>
+                                                <?php endif; ?>
+                                            </div>
+                                            <button type="submit">Post comment</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </section>
                             </figcaption>
                         </figure>
                     <?php endforeach; ?>

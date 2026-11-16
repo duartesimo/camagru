@@ -197,7 +197,8 @@ main {
     gap: 0.5rem;
 }
 
-.photo-likes button {
+.photo-likes button,
+.photo-comments button {
     min-height: 2rem;
     padding: 0.25rem 0.6rem;
     border: 1px solid #e0d9d3;
@@ -210,13 +211,73 @@ main {
 }
 
 .photo-likes button:hover,
+.photo-comments button:hover,
 .photo-likes button[aria-pressed="true"] {
     background: #fff4f1;
 }
 
-.photo-likes button:focus-visible {
+.photo-likes button:focus-visible,
+.photo-comments button:focus-visible {
     outline: 3px solid #fa604a;
     outline-offset: 2px;
+}
+
+.photo-comments {
+    flex-basis: 100%;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e9e6e1;
+}
+
+.photo-comments h3 {
+    margin: 0 0 0.5rem;
+    color: #202229;
+    font-size: 0.95rem;
+}
+
+.comment-list {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.comment-list li + li {
+    padding-top: 0.65rem;
+    border-top: 1px solid #e9e6e1;
+}
+
+.comment-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.2rem 0.5rem;
+}
+
+.comment-meta time {
+    color: #62676f;
+    font-size: 0.8rem;
+}
+
+.photo-comments p {
+    margin-top: 0.2rem;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.photo-comments form {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+}
+
+.photo-comments textarea {
+    min-height: 4.5rem;
+    resize: vertical;
+}
+
+.photo-comments button {
+    justify-self: start;
 }
 
 .gallery-empty {
@@ -392,7 +453,8 @@ main {
     font-weight: 700;
 }
 
-.form-field input {
+.form-field input,
+.form-field textarea {
     width: 100%;
     min-height: 3.1rem;
     padding: 0.7rem 0.95rem;
@@ -407,12 +469,14 @@ main {
     color: #90939b;
 }
 
-.form-field input:focus-visible {
+.form-field input:focus-visible,
+.form-field textarea:focus-visible {
     border-color: #fa604a;
     outline: 3px solid rgb(250 96 74 / 18%);
 }
 
-.form-field input[aria-invalid="true"] {
+.form-field input[aria-invalid="true"],
+.form-field textarea[aria-invalid="true"] {
     border-color: #b53229;
 }
 

@@ -2,17 +2,14 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
 header('Cache-Control: no-store');
 
-if (isset($_SESSION['user_id'], $_SESSION['username'])
-    && is_int($_SESSION['user_id'])
-    && is_string($_SESSION['username'])) {
+if (authenticated_user()) {
     header('Location: /');
     exit;
 }
 
-require_once __DIR__ . '/../src/database.php';
 require_once __DIR__ . '/../src/email.php';
 
 if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {

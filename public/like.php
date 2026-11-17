@@ -8,11 +8,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     exit('Method not allowed.');
 }
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
 
-if (!isset($_SESSION['user_id'], $_SESSION['username'])
-    || !is_int($_SESSION['user_id'])
-    || !is_string($_SESSION['username'])) {
+if (!authenticated_user()) {
     header('Location: /login.php', true, 303);
     exit;
 }
@@ -45,8 +43,6 @@ if (is_string($pageInput) && preg_match('/\A[1-9][0-9]*\z/', $pageInput) === 1) 
         $page = $validPage;
     }
 }
-
-require_once __DIR__ . '/../src/database.php';
 
 try {
     $database = database_connection();

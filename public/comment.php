@@ -8,11 +8,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     exit('Method not allowed.');
 }
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
 
-if (!isset($_SESSION['user_id'], $_SESSION['username'])
-    || !is_int($_SESSION['user_id'])
-    || !is_string($_SESSION['username'])) {
+if (!authenticated_user()) {
     header('Location: /login.php', true, 303);
     exit;
 }
@@ -54,13 +52,12 @@ $content = is_string($contentInput) && preg_match('//u', $contentInput) === 1
     : null;
 $length = $content === null ? false : preg_match_all('/./us', $content);
 if ($content === null || $content === '' || strlen($content) > 2000
-    || $length === false || $length > 500) {
+    || str_contains($content, "\0") || $length === false || $length > 500) {
     $_SESSION['comment_error_photo_id'] = $photoId;
     header('Location: ' . $location, true, 303);
     exit;
 }
 
-require_once __DIR__ . '/../src/database.php';
 require_once __DIR__ . '/../src/email.php';
 
 try {

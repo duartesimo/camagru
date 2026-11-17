@@ -2,18 +2,15 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
 
-if (!isset($_SESSION['user_id'], $_SESSION['username'])
-    || !is_int($_SESSION['user_id'])
-    || !is_string($_SESSION['username'])) {
+if (!authenticated_user()) {
     header('Location: /login.php');
     exit;
 }
 
 header('Cache-Control: no-store');
 
-require_once __DIR__ . '/../src/database.php';
 require_once __DIR__ . '/../src/email.php';
 
 function end_current_session(): void
@@ -115,10 +112,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !$loadError) {
             $emailChanged = false;
             try {
                 $database->beginTransaction();
-                $statement = $database->prepare('SELECT email, password_hash FROM users WHERE id = :id FOR UPDATE');
+                $statement = $database->prepare(
+                    'SELECT email, email_verified_at, password_hash FROM users WHERE id = :id FOR UPDATE'
+                );
                 $statement->execute(['id' => $userId]);
                 $currentUser = $statement->fetch();
-                if (!is_array($currentUser)) {
+                if (!is_array($currentUser) || $currentUser['email_verified_at'] === null) {
                     throw new RuntimeException('Account unavailable.');
                 }
 
@@ -208,10 +207,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !$loadError) {
             $passwordChanged = false;
             try {
                 $database->beginTransaction();
-                $statement = $database->prepare('SELECT password_hash FROM users WHERE id = :id FOR UPDATE');
+                $statement = $database->prepare(
+                    'SELECT email, email_verified_at, password_hash FROM users WHERE id = :id FOR UPDATE'
+                );
                 $statement->execute(['id' => $userId]);
                 $currentUser = $statement->fetch();
-                if (!is_array($currentUser)) {
+                if (!is_array($currentUser) || $currentUser['email_verified_at'] === null) {
                     throw new RuntimeException('Account unavailable.');
                 }
 
@@ -250,6 +251,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !$loadError) {
                     header('Location: /login.php', true, 303);
                     exit;
                 }
+                $_SESSION['auth_marker'] = authentication_marker(
+                    $currentUser['email'], $currentUser['email_verified_at'], $passwordHash
+                );
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                 $_SESSION['settings_notice'] = 'Password updated.';
                 header('Location: /settings.php', true, 303);

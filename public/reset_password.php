@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
+start_camagru_session();
 header('Cache-Control: no-store');
 header('Referrer-Policy: no-referrer');
 

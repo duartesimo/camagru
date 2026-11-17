@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
 
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
@@ -19,9 +19,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     reject_capture(405, 'Use POST to capture a photo.');
 }
 
-if (!isset($_SESSION['user_id'], $_SESSION['username'])
-    || !is_int($_SESSION['user_id'])
-    || !is_string($_SESSION['username'])) {
+if (!authenticated_user()) {
     reject_capture(401, 'Please log in and try again.');
 }
 
@@ -96,8 +94,6 @@ $result = ob_get_clean();
 if (!$encoded || !is_string($result) || $result === '') {
     reject_capture(500, 'The photo could not be processed.');
 }
-
-require_once __DIR__ . '/../src/database.php';
 
 try {
     $database = database_connection();

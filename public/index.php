@@ -2,20 +2,16 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
+
+$isLoggedIn = authenticated_user();
 
 $commentErrorPhotoId = $_SESSION['comment_error_photo_id'] ?? null;
 unset($_SESSION['comment_error_photo_id']);
 
-$isLoggedIn = isset($_SESSION['user_id'], $_SESSION['username'])
-    && is_int($_SESSION['user_id'])
-    && is_string($_SESSION['username']);
-
 if ($isLoggedIn && (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token']))) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
-
-require_once __DIR__ . '/../src/database.php';
 
 $pageSize = 6;
 $page = 1;
@@ -195,6 +191,7 @@ try {
                                             <div class="form-field">
                                                 <label for="comment-<?= (int) $photo['id'] ?>">Your comment</label>
                                                 <textarea id="comment-<?= (int) $photo['id'] ?>" name="content" aria-describedby="comment-hint-<?= (int) $photo['id'] ?><?= $hasCommentError ? ' comment-error-' . (int) $photo['id'] : '' ?>" <?= $hasCommentError ? 'aria-invalid="true"' : '' ?> required></textarea>
+                                                <p class="field-hint" id="comment-hint-<?= (int) $photo['id'] ?>">Maximum 500 characters.</p>
                                                 <?php if ($hasCommentError): ?>
                                                     <p class="field-error" id="comment-error-<?= (int) $photo['id'] ?>" role="alert">Enter a comment of 1 to 500 characters.</p>
                                                 <?php endif; ?>

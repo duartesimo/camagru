@@ -2,16 +2,13 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
 
-if (isset($_SESSION['user_id'], $_SESSION['username'])
-    && is_int($_SESSION['user_id'])
-    && is_string($_SESSION['username'])) {
+if (authenticated_user()) {
     header('Location: /');
     exit;
 }
 
-require_once __DIR__ . '/../src/database.php';
 require_once __DIR__ . '/../src/email.php';
 
 if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
@@ -106,7 +103,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         } else {
             try {
                 $statement = database_connection()->prepare(
-                    'SELECT id, username, password_hash, email_verified_at
+                    'SELECT id, username, email, password_hash, email_verified_at
                      FROM users
                      WHERE username = :username OR email = :email
                      LIMIT 1'
@@ -127,6 +124,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
                         $_SESSION['user_id'] = (int) $user['id'];
                         $_SESSION['username'] = $user['username'];
+                        $_SESSION['auth_marker'] = authentication_marker(
+                            $user['email'], $user['email_verified_at'], $user['password_hash']
+                        );
                         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                         header('Location: /', true, 303);
                         exit;

@@ -2,13 +2,9 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
 
-$isLoggedIn = isset($_SESSION['user_id'], $_SESSION['username'])
-    && is_int($_SESSION['user_id'])
-    && is_string($_SESSION['username']);
-
-if (!$isLoggedIn) {
+if (!authenticated_user()) {
     header('Location: /login.php');
     exit;
 }
@@ -21,8 +17,6 @@ if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
 
 $deleteStatus = $_SESSION['photo_delete_status'] ?? null;
 unset($_SESSION['photo_delete_status']);
-
-require_once __DIR__ . '/../src/database.php';
 
 $personalPhotos = [];
 $historyError = false;

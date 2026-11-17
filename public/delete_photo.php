@@ -8,11 +8,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     exit('Method not allowed.');
 }
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
 
-if (!isset($_SESSION['user_id'], $_SESSION['username'])
-    || !is_int($_SESSION['user_id'])
-    || !is_string($_SESSION['username'])) {
+if (!authenticated_user()) {
     header('Location: /login.php', true, 303);
     exit;
 }
@@ -28,8 +26,6 @@ if (is_string($idInput) && preg_match('/\A[1-9][0-9]*\z/', $idInput) === 1) {
 
 $deleted = false;
 if ($validToken && $photoId !== false) {
-    require_once __DIR__ . '/../src/database.php';
-
     $database = null;
     try {
         $database = database_connection();

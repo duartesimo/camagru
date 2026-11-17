@@ -6,6 +6,10 @@ function database_connection(): PDO
 {
     static $connection = null;
 
+    if ($connection instanceof PDO) {
+        return $connection;
+    }
+
     $host = getenv('DB_HOST');
     $name = getenv('DB_NAME');
     $user = getenv('DB_USER');

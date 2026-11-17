@@ -2,12 +2,18 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../src/auth.php';
+start_camagru_session();
+
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+    header('Allow: POST');
+    http_response_code(405);
+    exit('Method not allowed.');
+}
 
 $token = $_POST['csrf_token'] ?? null;
 
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST'
-    || !isset($_SESSION['user_id'], $_SESSION['csrf_token'])
+if (!isset($_SESSION['user_id'], $_SESSION['csrf_token'])
     || !is_string($_SESSION['csrf_token'])
     || !is_string($token)
     || !hash_equals($_SESSION['csrf_token'], $token)) {

@@ -61,6 +61,7 @@ if ($content === null || $content === '' || strlen($content) > 2000
 }
 
 require_once __DIR__ . '/../src/database.php';
+require_once __DIR__ . '/../src/email.php';
 
 try {
     $database = database_connection();
@@ -82,6 +83,28 @@ try {
 } catch (PDOException | RuntimeException) {
     http_response_code(503);
     exit('Could not post the comment. Please try again later.');
+}
+
+try {
+    $statement = $database->prepare(
+        'SELECT u.email, u.email_notifications_enabled::int AS notifications_enabled,
+                (SELECT COUNT(*) FROM photos newer
+                 WHERE newer.created_at > p.created_at
+                    OR (newer.created_at = p.created_at AND newer.id > p.id)) AS newer_count
+         FROM photos p
+         JOIN users u ON u.id = p.user_id
+         WHERE p.id = :photo_id'
+    );
+    $statement->bindValue(':photo_id', $photoId, PDO::PARAM_INT);
+    $statement->execute();
+    $owner = $statement->fetch(PDO::FETCH_ASSOC);
+
+    if (is_array($owner) && (int) $owner['notifications_enabled'] === 1) {
+        $galleryPage = intdiv((int) $owner['newer_count'], 6) + 1;
+        send_comment_notification_email($owner['email'], $_SESSION['username'], $photoId, $galleryPage);
+    }
+} catch (Throwable) {
+    // The comment is already saved; email delivery must not prevent the redirect.
 }
 
 unset($_SESSION['comment_error_photo_id']);

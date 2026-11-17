@@ -65,3 +65,17 @@ function send_password_reset_email(string $to, string $token): bool
 
     return send_email($to, 'Reset your Camagru password', $body);
 }
+
+function send_comment_notification_email(string $to, string $commenter, int $photoId, int $page): bool
+{
+    $baseUrl = application_base_url();
+    if ($baseUrl === false) {
+        return false;
+    }
+
+    $link = $baseUrl . ($page === 1 ? '/' : '/?page=' . $page) . '#photo-' . $photoId;
+    $body = "{$commenter} commented on your Camagru photo.\n\n"
+        . "View the photo and comment:\n{$link}\n";
+
+    return send_email($to, 'New comment on your Camagru photo', $body);
+}

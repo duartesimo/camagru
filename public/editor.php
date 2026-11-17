@@ -85,69 +85,67 @@ try {
         <?php endif; ?>
 
         <div class="editor-workspace">
-            <div class="editor-main">
-                <section class="editor-panel" aria-labelledby="camera-title">
-                    <h2 id="camera-title">Photo preview</h2>
-                    <fieldset class="photo-source-picker">
-                        <legend>Image source</legend>
-                        <label><input id="source-webcam" type="radio" name="photo-source" value="webcam" checked> Webcam</label>
-                        <label><input id="source-upload" type="radio" name="photo-source" value="upload"> Upload an image</label>
-                    </fieldset>
-                    <div class="upload-controls" id="upload-controls" hidden>
-                        <label for="upload-image">Choose a PNG or JPEG image</label>
-                        <input id="upload-image" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" aria-describedby="upload-hint">
-                        <p id="upload-hint">Maximum 10 MB and 24 megapixels. The center will be cropped to 4:3.</p>
-                    </div>
-                    <div class="camera-frame">
-                        <video id="camera-preview" autoplay muted playsinline aria-label="Live webcam preview"></video>
-                        <img id="upload-preview" alt="Selected image preview" hidden>
-                        <img class="camera-overlay" id="camera-overlay" alt="" hidden>
-                    </div>
-                    <div class="camera-controls">
-                        <div class="camera-buttons" id="camera-buttons">
-                            <button class="submit-button" id="start-camera" type="button">Start camera</button>
-                            <button class="camera-stop-button" id="stop-camera" type="button" disabled>Stop camera</button>
-                        </div>
-                        <button class="submit-button" id="take-photo" type="button" disabled>Take photo</button>
-                    </div>
-                    <p class="camera-status" id="camera-status" role="status" aria-live="polite">Camera is off.</p>
-                    <p class="capture-message" id="capture-message" role="alert" hidden></p>
-                    <section class="capture-result" id="capture-result" aria-labelledby="capture-result-title" hidden>
-                        <h3 id="capture-result-title">Last photo</h3>
-                        <img id="final-photo" alt="Photo with the selected overlay">
-                        <p class="capture-success" id="capture-success" role="status" hidden>Photo saved to your account.</p>
-                    </section>
-                    <noscript>
-                        <p class="camera-status">Enable JavaScript to use the photo editor.</p>
-                    </noscript>
-                </section>
-                <fieldset class="overlay-picker">
-                    <legend>Choose an overlay</legend>
-                    <p>Select one PNG to preview over your image. You can choose an overlay before starting the camera or selecting an image.</p>
-                    <div class="overlay-options">
-                        <input class="overlay-radio" type="radio" name="overlay" id="overlay-hat" value="hat" data-src="/assets/images/overlays/hat.png">
-                        <label class="overlay-choice" for="overlay-hat">
-                            <img src="/assets/images/overlays/hat.png" alt="" width="96" height="72">
-                            <span>Hat</span>
-                        </label>
+            <section class="overlay-picker" aria-labelledby="overlay-title">
+                <h2 id="overlay-title">Choose an overlay</h2>
+                <p>Select one PNG to preview over your image. You can choose an overlay before starting the camera or selecting an image.</p>
+                <div class="overlay-options" role="radiogroup" aria-labelledby="overlay-title">
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-hat" value="hat" data-src="/assets/images/overlays/hat.png">
+                    <label class="overlay-choice" for="overlay-hat">
+                        <img src="/assets/images/overlays/hat.png" alt="" width="96" height="72">
+                        <span>Hat</span>
+                    </label>
 
-                        <input class="overlay-radio" type="radio" name="overlay" id="overlay-sunglasses" value="sunglasses" data-src="/assets/images/overlays/sunglasses.png">
-                        <label class="overlay-choice" for="overlay-sunglasses">
-                            <img src="/assets/images/overlays/sunglasses.png" alt="" width="96" height="72">
-                            <span>Sunglasses</span>
-                        </label>
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-sunglasses" value="sunglasses" data-src="/assets/images/overlays/sunglasses.png">
+                    <label class="overlay-choice" for="overlay-sunglasses">
+                        <img src="/assets/images/overlays/sunglasses.png" alt="" width="96" height="72">
+                        <span>Sunglasses</span>
+                    </label>
 
-                        <input class="overlay-radio" type="radio" name="overlay" id="overlay-frame" value="frame" data-src="/assets/images/overlays/frame.png">
-                        <label class="overlay-choice" for="overlay-frame">
-                            <img src="/assets/images/overlays/frame.png" alt="" width="96" height="72">
-                            <span>Frame</span>
-                        </label>
-                    </div>
-                    <button class="camera-stop-button clear-overlay-button" id="clear-overlay" type="button" disabled>Clear overlay</button>
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-frame" value="frame" data-src="/assets/images/overlays/frame.png">
+                    <label class="overlay-choice" for="overlay-frame">
+                        <img src="/assets/images/overlays/frame.png" alt="" width="96" height="72">
+                        <span>Frame</span>
+                    </label>
+                </div>
+                <button class="camera-stop-button clear-overlay-button" id="clear-overlay" type="button" disabled>Clear overlay</button>
+            </section>
+
+            <section class="editor-panel" aria-labelledby="camera-title">
+                <h2 id="camera-title">Photo preview</h2>
+                <fieldset class="photo-source-picker">
+                    <legend>Image source</legend>
+                    <label><input id="source-webcam" type="radio" name="photo-source" value="webcam" checked> Webcam</label>
+                    <label><input id="source-upload" type="radio" name="photo-source" value="upload"> Upload an image</label>
                 </fieldset>
-            </div>
-
-            <aside class="editor-sidebar" aria-labelledby="personal-photos-title">
+                <div class="upload-controls" id="upload-controls" hidden>
+                    <label for="upload-image">Choose a PNG or JPEG image</label>
+                    <input id="upload-image" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" aria-describedby="upload-hint">
+                    <p id="upload-hint">Maximum 10 MB and 24 megapixels. The center will be cropped to 4:3.</p>
+                </div>
+                <div class="camera-frame">
+                    <video id="camera-preview" autoplay muted playsinline aria-label="Live webcam preview"></video>
+                    <img id="upload-preview" alt="Selected image preview" hidden>
+                    <img class="camera-overlay" id="camera-overlay" alt="" hidden>
+                </div>
+                <div class="camera-controls">
+                    <div class="camera-buttons" id="camera-buttons">
+                        <button class="submit-button" id="start-camera" type="button">Start camera</button>
+                        <button class="camera-stop-button" id="stop-camera" type="button" disabled>Stop camera</button>
+                    </div>
+                    <button class="submit-button" id="take-photo" type="button" disabled>Take photo</button>
+                </div>
+                <p class="camera-status" id="camera-status" role="status" aria-live="polite">Camera is off.</p>
+                <p class="capture-message" id="capture-message" role="alert" hidden></p>
+                <section class="capture-result" id="capture-result" aria-labelledby="capture-result-title" hidden>
+                    <h3 id="capture-result-title">Last photo</h3>
+                    <img id="final-photo" alt="Photo with the selected overlay">
+                    <p class="capture-success" id="capture-success" role="status" hidden>Photo saved to your account.</p>
+                </section>
+                <noscript>
+                    <p class="camera-status">Enable JavaScript to use the photo editor.</p>
+                </noscript>
+            </section>
+            <section class="editor-sidebar" aria-labelledby="personal-photos-title">
                 <h2 id="personal-photos-title">My photos</h2>
                 <?php if ($historyError): ?>
                     <p>Your photos are unavailable right now.</p>
@@ -167,7 +165,7 @@ try {
                         <?php endforeach; ?>
                     </ul>
                 <?php endif; ?>
-            </aside>
+            </section>
         </div>
     </main>
 

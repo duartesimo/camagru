@@ -139,9 +139,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                 <strong>Camagru</strong>
             </a>
             <nav class="site-nav" aria-label="Main navigation">
-                <a href="/">Gallery</a>
-                <a href="/login.php">Login</a>
-                <a class="nav-active" href="/register.php" aria-current="page">Register</a>
+                <div class="nav-links">
+                    <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8" cy="9" r="1.5" /><path d="m3 17 5-5 4 4 3-3 6 6" /></svg>Gallery</a>
+                    <a href="/login.php"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><path d="M3 12h13m-4-4 4 4-4 4" /></svg>Login</a>
+                    <a class="nav-active" href="/register.php" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3" /><path d="M3 21v-1a6 6 0 0 1 12 0v1M18 8v6m-3-3h6" /></svg>Register</a>
+                </div>
             </nav>
         </div>
     </header>

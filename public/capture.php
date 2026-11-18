@@ -35,6 +35,15 @@ $overlays = [
     'hat' => __DIR__ . '/assets/images/overlays/hat.png',
     'sunglasses' => __DIR__ . '/assets/images/overlays/sunglasses.png',
     'frame' => __DIR__ . '/assets/images/overlays/frame.png',
+    'superhero_mask' => __DIR__ . '/assets/images/overlays/superhero_mask.png',
+    'cat_ears' => __DIR__ . '/assets/images/overlays/cat_ears.png',
+    'moustache' => __DIR__ . '/assets/images/overlays/moustache.png',
+    'flower_crown' => __DIR__ . '/assets/images/overlays/flower_crown.png',
+    'funny_glasses' => __DIR__ . '/assets/images/overlays/funny_glasses.png',
+    'devil_horns' => __DIR__ . '/assets/images/overlays/devil_horns.png',
+    'crown' => __DIR__ . '/assets/images/overlays/crown.png',
+    'pirate_hat' => __DIR__ . '/assets/images/overlays/pirate_hat.png',
+    'astronaut_helmet' => __DIR__ . '/assets/images/overlays/astronaut_helmet.png',
 ];
 $overlayName = $_POST['overlay'] ?? null;
 if (!is_string($overlayName) || !isset($overlays[$overlayName])) {

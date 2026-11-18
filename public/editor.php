@@ -106,6 +106,60 @@ try {
                         <img src="/assets/images/overlays/frame.png" alt="" width="96" height="72">
                         <span>Frame</span>
                     </label>
+
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-superhero-mask" value="superhero_mask" data-src="/assets/images/overlays/superhero_mask.png">
+                    <label class="overlay-choice" for="overlay-superhero-mask">
+                        <img src="/assets/images/overlays/superhero_mask.png" alt="" width="96" height="72">
+                        <span>Superhero mask</span>
+                    </label>
+
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-cat-ears" value="cat_ears" data-src="/assets/images/overlays/cat_ears.png">
+                    <label class="overlay-choice" for="overlay-cat-ears">
+                        <img src="/assets/images/overlays/cat_ears.png" alt="" width="96" height="72">
+                        <span>Cat ears</span>
+                    </label>
+
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-moustache" value="moustache" data-src="/assets/images/overlays/moustache.png">
+                    <label class="overlay-choice" for="overlay-moustache">
+                        <img src="/assets/images/overlays/moustache.png" alt="" width="96" height="72">
+                        <span>Moustache</span>
+                    </label>
+
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-flower-crown" value="flower_crown" data-src="/assets/images/overlays/flower_crown.png">
+                    <label class="overlay-choice" for="overlay-flower-crown">
+                        <img src="/assets/images/overlays/flower_crown.png" alt="" width="96" height="72">
+                        <span>Flower crown</span>
+                    </label>
+
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-funny-glasses" value="funny_glasses" data-src="/assets/images/overlays/funny_glasses.png">
+                    <label class="overlay-choice" for="overlay-funny-glasses">
+                        <img src="/assets/images/overlays/funny_glasses.png" alt="" width="96" height="72">
+                        <span>Funny glasses</span>
+                    </label>
+
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-devil-horns" value="devil_horns" data-src="/assets/images/overlays/devil_horns.png">
+                    <label class="overlay-choice" for="overlay-devil-horns">
+                        <img src="/assets/images/overlays/devil_horns.png" alt="" width="96" height="72">
+                        <span>Devil horns</span>
+                    </label>
+
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-crown" value="crown" data-src="/assets/images/overlays/crown.png">
+                    <label class="overlay-choice" for="overlay-crown">
+                        <img src="/assets/images/overlays/crown.png" alt="" width="96" height="72">
+                        <span>Crown</span>
+                    </label>
+
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-pirate-hat" value="pirate_hat" data-src="/assets/images/overlays/pirate_hat.png">
+                    <label class="overlay-choice" for="overlay-pirate-hat">
+                        <img src="/assets/images/overlays/pirate_hat.png" alt="" width="96" height="72">
+                        <span>Pirate hat</span>
+                    </label>
+
+                    <input class="overlay-radio" type="radio" name="overlay" id="overlay-astronaut-helmet" value="astronaut_helmet" data-src="/assets/images/overlays/astronaut_helmet.png">
+                    <label class="overlay-choice" for="overlay-astronaut-helmet">
+                        <img src="/assets/images/overlays/astronaut_helmet.png" alt="" width="96" height="72">
+                        <span>Astronaut helmet</span>
+                    </label>
                 </div>
                 <button class="camera-stop-button clear-overlay-button" id="clear-overlay" type="button" disabled>Clear overlay</button>
             </section>

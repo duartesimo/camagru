@@ -88,6 +88,7 @@ try {
     <meta name="description" content="Camagru is a place to create and share photos.">
     <title>Camagru | Gallery</title>
     <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/gallery.js" defer></script>
 </head>
 
 <body>
@@ -152,7 +153,9 @@ try {
                         $likedByMe = (int) $photo['liked_by_me'] === 1;
                         ?>
                         <figure class="photo-card" id="photo-<?= (int) $photo['id'] ?>">
-                            <img src="/photo.php?id=<?= (int) $photo['id'] ?>" alt="Photo shared by <?= $author ?>" width="640" height="480" loading="lazy">
+                            <button class="photo-open" type="button" data-author="<?= $author ?>" aria-label="Enlarge photo by <?= $author ?>">
+                                <img src="/photo.php?id=<?= (int) $photo['id'] ?>" alt="" width="640" height="480" loading="lazy">
+                            </button>
                             <figcaption>
                                 <span>By <strong><?= $author ?></strong></span>
                                 <div class="photo-likes">
@@ -223,6 +226,21 @@ try {
             <?php endif; ?>
         </section>
     </main>
+
+    <dialog class="photo-lightbox" id="photo-lightbox" aria-label="Photo viewer">
+        <div class="lightbox-header">
+            <button class="lightbox-arrow lightbox-prev" id="lightbox-prev" type="button" aria-label="Previous photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg></button>
+            <button class="lightbox-arrow lightbox-next" id="lightbox-next" type="button" aria-label="Next photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></button>
+            <button class="lightbox-close" id="lightbox-close" type="button">Close ×</button>
+        </div>
+        <div class="lightbox-stage">
+            <img class="lightbox-photo" id="lightbox-image" alt="">
+        </div>
+        <div class="lightbox-caption">
+            <span id="lightbox-author"></span>
+            <span id="lightbox-counter"></span>
+        </div>
+    </dialog>
 
     <footer class="site-footer">
         <div class="container footer-inner">

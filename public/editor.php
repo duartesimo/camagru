@@ -201,6 +201,7 @@ try {
             </section>
             <section class="editor-sidebar" aria-labelledby="personal-photos-title">
                 <h2 id="personal-photos-title">My photos</h2>
+                <a class="my-gallery-link" href="/my_gallery.php">View all my photos</a>
                 <?php if ($historyError): ?>
                     <p>Your photos are unavailable right now.</p>
                 <?php elseif ($personalPhotos === []): ?>

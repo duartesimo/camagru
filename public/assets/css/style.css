@@ -238,7 +238,8 @@ main {
 }
 
 .photo-likes button,
-.photo-comments button {
+.photo-comments button,
+.my-gallery-delete {
     min-height: 2rem;
     padding: 0.25rem 0.6rem;
     border: 1px solid #e0d9d3;
@@ -252,12 +253,14 @@ main {
 
 .photo-likes button:hover,
 .photo-comments button:hover,
+.my-gallery-delete:hover,
 .photo-likes button[aria-pressed="true"] {
     background: #fff4f1;
 }
 
 .photo-likes button:focus-visible,
-.photo-comments button:focus-visible {
+.photo-comments button:focus-visible,
+.my-gallery-delete:focus-visible {
     outline: 3px solid #fa604a;
     outline-offset: 2px;
 }
@@ -326,6 +329,18 @@ main {
     border-radius: 0.9rem;
     background: #fff;
     color: #62676f;
+}
+
+.gallery-empty a,
+.my-gallery-link {
+    color: #a02e23;
+    font-weight: 650;
+}
+
+.my-gallery-link {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
 }
 
 .gallery-pagination {

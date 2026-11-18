@@ -74,5 +74,18 @@ if ($validToken && $photoId !== false) {
 }
 
 $_SESSION['photo_delete_status'] = $deleted ? 'success' : 'error';
-header('Location: /editor.php', true, 303);
+$returnLocation = '/editor.php';
+if (($_POST['return_to'] ?? null) === 'my_gallery') {
+    $returnLocation = '/my_gallery.php';
+    $pageInput = $_POST['page'] ?? null;
+    if (is_string($pageInput) && preg_match('/\A[1-9][0-9]*\z/', $pageInput) === 1) {
+        $validPage = filter_var($pageInput, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1, 'max_range' => intdiv(PHP_INT_MAX, 6)],
+        ]);
+        if ($validPage !== false && $validPage > 1) {
+            $returnLocation .= '?page=' . $validPage;
+        }
+    }
+}
+header('Location: ' . $returnLocation, true, 303);
 exit;

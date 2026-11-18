@@ -847,17 +847,14 @@ main {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.45rem;
+    width: 2.4rem;
     min-height: 2.4rem;
-    padding: 0.4rem 0.7rem;
+    padding: 0;
     border: 1px solid #d8d5d0;
     border-radius: 0.65rem;
     background: #fff;
     color: #24272d;
     cursor: pointer;
-    font: inherit;
-    font-size: 0.9rem;
-    font-weight: 650;
 }
 
 .logout-button:hover {

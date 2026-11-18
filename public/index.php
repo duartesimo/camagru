@@ -106,10 +106,9 @@ try {
                     <a class="nav-active" href="/" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8" cy="9" r="1.5" /><path d="m3 17 5-5 4 4 3-3 6 6" /></svg>Gallery</a>
                     <?php if ($isLoggedIn): ?>
                         <a href="/editor.php"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" /><circle cx="12" cy="14" r="4" /></svg>Editor</a>
-                        <a href="/settings.php"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" /></svg>Settings</a>
+                        <a href="/settings.php"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.2 2h3.6l.5 2.2 1.5.6 1.9-1.2 2.5 2.5-1.2 1.9.6 1.5 2.2.5v3.6l-2.2.5-.6 1.5 1.2 1.9-2.5 2.5-1.9-1.2-1.5.6-.5 2.2h-3.6l-.5-2.2-1.5-.6-1.9 1.2-2.5-2.5 1.2-1.9-.6-1.5L2 13.8v-3.6l2.2-.5.6-1.5-1.2-1.9 2.5-2.5 1.9 1.2 1.5-.6L10.2 2Z" /><circle cx="12" cy="12" r="3" /></svg>Settings</a>
                     <?php else: ?>
                         <a href="/login.php"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><path d="M3 12h13m-4-4 4 4-4 4" /></svg>Login</a>
-                        <a href="/register.php"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3" /><path d="M3 21v-1a6 6 0 0 1 12 0v1M18 8v6m-3-3h6" /></svg>Register</a>
                     <?php endif; ?>
                 </div>
                 <?php if ($isLoggedIn): ?>
@@ -117,7 +116,7 @@ try {
                         <span class="nav-username"><span class="nav-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" /><path d="M5 21v-1a7 7 0 0 1 14 0v1" /></svg></span><strong><?= htmlspecialchars($_SESSION['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></strong></span>
                         <form class="logout-form" action="/logout.php" method="post">
                             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
-                            <button class="logout-button" type="submit" aria-label="Log out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4" /><path d="m15 7 5 5-5 5M20 12H9" /></svg>Logout</button>
+                            <button class="logout-button" type="submit" aria-label="Log out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4" /><path d="m15 7 5 5-5 5M20 12H9" /></svg></button>
                         </form>
                     </div>
                 <?php endif; ?>

@@ -348,25 +348,49 @@ main {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     margin-top: 1.5rem;
     font-size: 0.9rem;
 }
 
-.gallery-pagination a {
-    display: inline-flex;
-    align-items: center;
+.gallery-pagination a,
+.gallery-pagination .pagination-current {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2.5rem;
     min-height: 2.5rem;
-    padding: 0.45rem 0.9rem;
+    padding: 0 0.65rem;
     border: 1px solid #e0d9d3;
+    background: #f4f2ee;
+    color: #24272d;
+    text-decoration: none;
+}
+
+.gallery-pagination .pagination-number {
+    width: 2.5rem;
+    padding: 0;
+    border-radius: 50%;
+    font-weight: 650;
+}
+
+.gallery-pagination .pagination-step {
     border-radius: 0.5rem;
     background: #fff;
     color: #a02e23;
     font-weight: 650;
-    text-decoration: none;
+}
+
+.gallery-pagination .pagination-current {
+    border-color: #24272d;
+    background: #24272d;
+    color: #fff;
 }
 
 .gallery-pagination a:hover {
+    background: #e9e6e1;
+}
+
+.gallery-pagination .pagination-step:hover {
     background: #fff4f1;
 }
 
@@ -375,9 +399,28 @@ main {
     outline-offset: 2px;
 }
 
-.gallery-pagination span {
+.gallery-pagination .pagination-ellipsis {
+    min-width: 1.5rem;
     color: #62676f;
-    font-weight: 600;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .gallery-pagination {
+        gap: 0.35rem;
+    }
+
+    .gallery-pagination a,
+    .gallery-pagination .pagination-current {
+        min-width: 2.25rem;
+        min-height: 2.25rem;
+        padding-inline: 0.45rem;
+    }
+
+    .gallery-pagination .pagination-number {
+        width: 2.25rem;
+        padding: 0;
+    }
 }
 
 .photo-lightbox {

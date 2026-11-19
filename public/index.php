@@ -27,11 +27,17 @@ if (is_string($pageInput) && preg_match('/\A[1-9][0-9]*\z/', $pageInput) === 1) 
 
 $photos = [];
 $commentsByPhoto = [];
-$hasNextPage = false;
+$totalPages = 1;
 $galleryError = false;
 
 try {
     $database = database_connection();
+    $countStatement = $database->prepare('SELECT COUNT(*) FROM photos');
+    $countStatement->execute();
+    $totalPhotos = (int) $countStatement->fetchColumn();
+    $totalPages = max(1, intdiv($totalPhotos - 1, $pageSize) + 1);
+    $page = min($page, $totalPages);
+
     $statement = $database->prepare(
         'SELECT p.id, u.username,
                 COUNT(l.user_id) AS like_count,
@@ -48,15 +54,10 @@ try {
          ORDER BY p.created_at DESC, p.id DESC'
     );
     $statement->bindValue(':viewer_id', $isLoggedIn ? $_SESSION['user_id'] : 0, PDO::PARAM_INT);
-    $statement->bindValue(':limit', $pageSize + 1, PDO::PARAM_INT);
+    $statement->bindValue(':limit', $pageSize, PDO::PARAM_INT);
     $statement->bindValue(':offset', ($page - 1) * $pageSize, PDO::PARAM_INT);
     $statement->execute();
     $photos = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-    if (count($photos) > $pageSize) {
-        $hasNextPage = true;
-        array_pop($photos);
-    }
 
     if ($photos !== []) {
         $placeholders = implode(', ', array_fill(0, count($photos), '?'));
@@ -77,6 +78,28 @@ try {
     }
 } catch (PDOException | RuntimeException) {
     $galleryError = true;
+}
+
+$firstNumber = max(2, $page - 1);
+$lastNumber = min($totalPages - 1, $page + 1);
+if ($page <= 2) {
+    $lastNumber = min($totalPages - 1, 3);
+}
+if ($page >= $totalPages - 1) {
+    $firstNumber = max(2, $totalPages - 2);
+}
+if ($firstNumber === 3) {
+    $firstNumber = 2;
+}
+if ($lastNumber === $totalPages - 2) {
+    $lastNumber = $totalPages - 1;
+}
+$pageNumbers = [1];
+for ($number = $firstNumber; $number <= $lastNumber; $number++) {
+    $pageNumbers[] = $number;
+}
+if ($totalPages > 1) {
+    $pageNumbers[] = $totalPages;
 }
 ?>
 <!doctype html>
@@ -212,14 +235,25 @@ try {
                 </div>
             <?php endif; ?>
 
-            <?php if (!$galleryError && ($page > 1 || $hasNextPage)): ?>
+            <?php if (!$galleryError && $totalPages > 1): ?>
                 <nav class="gallery-pagination" aria-label="Gallery pages">
                     <?php if ($page > 1): ?>
-                        <a href="/?page=<?= $page - 1 ?>#gallery" rel="prev">Previous</a>
+                        <a class="pagination-step" href="/?page=<?= $page - 1 ?>#gallery" rel="prev">Previous</a>
                     <?php endif; ?>
-                    <span>Page <?= $page ?></span>
-                    <?php if ($hasNextPage): ?>
-                        <a href="/?page=<?= $page + 1 ?>#gallery" rel="next">Next</a>
+                    <?php $previousNumber = 0; ?>
+                    <?php foreach ($pageNumbers as $number): ?>
+                        <?php if ($previousNumber !== 0 && $number > $previousNumber + 1): ?>
+                            <span class="pagination-ellipsis" aria-hidden="true">…</span>
+                        <?php endif; ?>
+                        <?php if ($number === $page): ?>
+                            <span class="pagination-number pagination-current" aria-current="page"><?= $number ?></span>
+                        <?php else: ?>
+                            <a class="pagination-number" href="/?page=<?= $number ?>#gallery" aria-label="Page <?= $number ?>"><?= $number ?></a>
+                        <?php endif; ?>
+                        <?php $previousNumber = $number; ?>
+                    <?php endforeach; ?>
+                    <?php if ($page < $totalPages): ?>
+                        <a class="pagination-step" href="/?page=<?= $page + 1 ?>#gallery" rel="next">Next</a>
                     <?php endif; ?>
                 </nav>
             <?php endif; ?>

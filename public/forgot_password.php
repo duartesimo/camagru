@@ -92,6 +92,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Forgot password | Camagru</title>
     <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/nav.js" defer></script>
 </head>
 <body>
     <header class="site-header">
@@ -103,7 +104,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                 </svg>
                 <strong>Camagru</strong>
             </a>
-            <nav class="site-nav" aria-label="Main navigation">
+            <button class="menu-toggle" type="button" aria-controls="main-navigation" aria-expanded="false" aria-label="Open menu"><span></span><span></span><span></span></button>
+            <nav class="site-nav" id="main-navigation" aria-label="Main navigation">
                 <div class="nav-links">
                     <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8" cy="9" r="1.5" /><path d="m3 17 5-5 4 4 3-3 6 6" /></svg>Gallery</a>
                     <a href="/login.php"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><path d="M3 12h13m-4-4 4 4-4 4" /></svg>Login</a>

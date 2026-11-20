@@ -40,6 +40,7 @@ try {
     <meta name="description" content="Create a photo from your webcam or an uploaded image with a Camagru overlay.">
     <title>Editor | Camagru</title>
     <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="/assets/js/nav.js" defer></script>
     <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
     <script src="/assets/js/editor.js" defer></script>
 </head>
@@ -54,7 +55,8 @@ try {
                 </svg>
                 <strong>Camagru</strong>
             </a>
-            <nav class="site-nav" aria-label="Main navigation">
+            <button class="menu-toggle" type="button" aria-controls="main-navigation" aria-expanded="false" aria-label="Open menu"><span></span><span></span><span></span></button>
+            <nav class="site-nav" id="main-navigation" aria-label="Main navigation">
                 <div class="nav-links">
                     <a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8" cy="9" r="1.5" /><path d="m3 17 5-5 4 4 3-3 6 6" /></svg>Gallery</a>
                     <a class="nav-active" href="/editor.php" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" /><circle cx="12" cy="14" r="4" /></svg>Editor</a>
